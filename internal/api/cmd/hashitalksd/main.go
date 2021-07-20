@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"dadcorp.dev/api"
+	"github.com/hashicorp/terraform-provider-hashitalks/internal/api"
 )
 
 func main() {

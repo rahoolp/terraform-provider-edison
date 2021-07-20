@@ -7,16 +7,12 @@ import (
 )
 
 var (
-	ErrAccessPolicyNotFound            = errors.New("access policy not found")
-	ErrAccessPolicyAlreadyExists       = errors.New("access policy already exists")
-	ErrConsulClusterNotFound           = errors.New("consul cluster not found")
-	ErrConsulClusterAlreadyExists      = errors.New("consul cluster already exists")
-	ErrNomadClusterNotFound            = errors.New("nomad cluster not found")
-	ErrNomadClusterAlreadyExists       = errors.New("nomad cluster already exists")
-	ErrVaultClusterNotFound            = errors.New("vault cluster not found")
-	ErrVaultClusterAlreadyExists       = errors.New("vault cluster already exists")
-	ErrTerraformWorkspaceNotFound      = errors.New("terraform workspace not found")
-	ErrTerraformWorkspaceAlreadyExists = errors.New("terraform workspace already exists")
+	ErrTalkNotFound          = errors.New("talk not found")
+	ErrTalkAlreadyExists     = errors.New("talk already exists")
+	ErrSpeakerNotFound       = errors.New("speaker  not found")
+	ErrSpeakerAlreadyExists  = errors.New("speaker already exists")
+	ErrWorkshopNotFound      = errors.New("workshop  not found")
+	ErrWorkshopAlreadyExists = errors.New("workshop already exists")
 )
 
 type Storer struct {
@@ -26,8 +22,8 @@ type Storer struct {
 func NewStorer() (*Storer, error) {
 	db, err := memdb.NewMemDB(&memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
-			"accessPolicy": {
-				Name: "accessPolicy",
+			"talk": {
+				Name: "talk",
 				Indexes: map[string]*memdb.IndexSchema{
 					"id": {
 						Name:    "id",
@@ -36,8 +32,8 @@ func NewStorer() (*Storer, error) {
 					},
 				},
 			},
-			"nomadCluster": {
-				Name: "nomadCluster",
+			"speaker": {
+				Name: "speaker",
 				Indexes: map[string]*memdb.IndexSchema{
 					"id": {
 						Name:    "id",
@@ -46,28 +42,8 @@ func NewStorer() (*Storer, error) {
 					},
 				},
 			},
-			"vaultCluster": {
-				Name: "vaultCluster",
-				Indexes: map[string]*memdb.IndexSchema{
-					"id": {
-						Name:    "id",
-						Unique:  true,
-						Indexer: &memdb.StringFieldIndex{Field: "ID", Lowercase: true},
-					},
-				},
-			},
-			"consulCluster": {
-				Name: "consulCluster",
-				Indexes: map[string]*memdb.IndexSchema{
-					"id": {
-						Name:    "id",
-						Unique:  true,
-						Indexer: &memdb.StringFieldIndex{Field: "ID", Lowercase: true},
-					},
-				},
-			},
-			"terraformWorkspace": {
-				Name: "terraformWorkspace",
+			"workshop": {
+				Name: "workshop",
 				Indexes: map[string]*memdb.IndexSchema{
 					"id": {
 						Name:    "id",
@@ -86,29 +62,29 @@ func NewStorer() (*Storer, error) {
 	}, nil
 }
 
-func (s *Storer) GetAccessPolicy(id string) (AccessPolicy, error) {
+func (s *Storer) GetTalk(id string) (Talk, error) {
 	txn := s.db.Txn(false)
-	ap, err := txn.First("accessPolicy", "id", id)
+	ap, err := txn.First("talk", "id", id)
 	if err != nil {
-		return AccessPolicy{}, err
+		return Talk{}, err
 	}
 	if ap == nil {
-		return AccessPolicy{}, ErrAccessPolicyNotFound
+		return Talk{}, ErrTalkNotFound
 	}
-	return *ap.(*AccessPolicy), nil
+	return *ap.(*Talk), nil
 }
 
-func (s *Storer) CreateAccessPolicy(ap AccessPolicy) error {
+func (s *Storer) CreateTalk(ap Talk) error {
 	txn := s.db.Txn(true)
 	defer txn.Abort()
-	exists, err := txn.First("accessPolicy", "id", ap.ID)
+	exists, err := txn.First("talk", "id", ap.ID)
 	if err != nil {
 		return err
 	}
 	if exists != nil {
-		return ErrAccessPolicyAlreadyExists
+		return ErrTalkAlreadyExists
 	}
-	err = txn.Insert("accessPolicy", &ap)
+	err = txn.Insert("talk", &ap)
 	if err != nil {
 		return err
 	}
@@ -116,17 +92,17 @@ func (s *Storer) CreateAccessPolicy(ap AccessPolicy) error {
 	return nil
 }
 
-func (s *Storer) UpdateAccessPolicy(ap AccessPolicy) error {
+func (s *Storer) UpdateTalk(ap Talk) error {
 	txn := s.db.Txn(true)
 	defer txn.Abort()
-	existing, err := txn.First("accessPolicy", "id", ap.ID)
+	existing, err := txn.First("talk", "id", ap.ID)
 	if err != nil {
 		return err
 	}
 	if existing == nil {
-		return ErrAccessPolicyNotFound
+		return ErrTalkNotFound
 	}
-	err = txn.Insert("accessPolicy", &ap)
+	err = txn.Insert("talk", &ap)
 	if err != nil {
 		return err
 	}
@@ -134,17 +110,17 @@ func (s *Storer) UpdateAccessPolicy(ap AccessPolicy) error {
 	return nil
 }
 
-func (s *Storer) DeleteAccessPolicy(id string) error {
+func (s *Storer) DeleteTalk(id string) error {
 	txn := s.db.Txn(true)
 	defer txn.Abort()
-	existing, err := txn.First("accessPolicy", "id", id)
+	existing, err := txn.First("talk", "id", id)
 	if err != nil {
 		return err
 	}
 	if existing == nil {
-		return ErrAccessPolicyNotFound
+		return ErrTalkNotFound
 	}
-	err = txn.Delete("accessPolicy", existing)
+	err = txn.Delete("talk", existing)
 	if err != nil {
 		return err
 	}
@@ -152,29 +128,29 @@ func (s *Storer) DeleteAccessPolicy(id string) error {
 	return nil
 }
 
-func (s *Storer) GetConsulCluster(id string) (ConsulCluster, error) {
+func (s *Storer) GetSpeaker(id string) (Speaker, error) {
 	txn := s.db.Txn(false)
-	cluster, err := txn.First("consulCluster", "id", id)
+	ap, err := txn.First("speaker", "id", id)
 	if err != nil {
-		return ConsulCluster{}, err
+		return Speaker{}, err
 	}
-	if cluster == nil {
-		return ConsulCluster{}, ErrConsulClusterNotFound
+	if ap == nil {
+		return Speaker{}, ErrSpeakerNotFound
 	}
-	return *cluster.(*ConsulCluster), nil
+	return *ap.(*Speaker), nil
 }
 
-func (s *Storer) CreateConsulCluster(cluster ConsulCluster) error {
+func (s *Storer) CreateSpeaker(ap Speaker) error {
 	txn := s.db.Txn(true)
 	defer txn.Abort()
-	exists, err := txn.First("consulCluster", "id", cluster.ID)
+	exists, err := txn.First("speaker", "id", ap.ID)
 	if err != nil {
 		return err
 	}
 	if exists != nil {
-		return ErrConsulClusterAlreadyExists
+		return ErrSpeakerAlreadyExists
 	}
-	err = txn.Insert("consulCluster", &cluster)
+	err = txn.Insert("speaker", &ap)
 	if err != nil {
 		return err
 	}
@@ -182,17 +158,17 @@ func (s *Storer) CreateConsulCluster(cluster ConsulCluster) error {
 	return nil
 }
 
-func (s *Storer) UpdateConsulCluster(cluster ConsulCluster) error {
+func (s *Storer) UpdateSpeaker(ap Speaker) error {
 	txn := s.db.Txn(true)
 	defer txn.Abort()
-	existing, err := txn.First("consulCluster", "id", cluster.ID)
+	existing, err := txn.First("speaker", "id", ap.ID)
 	if err != nil {
 		return err
 	}
 	if existing == nil {
-		return ErrConsulClusterNotFound
+		return ErrSpeakerNotFound
 	}
-	err = txn.Insert("consulCluster", &cluster)
+	err = txn.Insert("speaker", &ap)
 	if err != nil {
 		return err
 	}
@@ -200,17 +176,17 @@ func (s *Storer) UpdateConsulCluster(cluster ConsulCluster) error {
 	return nil
 }
 
-func (s *Storer) DeleteConsulCluster(id string) error {
+func (s *Storer) DeleteSpeaker(id string) error {
 	txn := s.db.Txn(true)
 	defer txn.Abort()
-	existing, err := txn.First("consulCluster", "id", id)
+	existing, err := txn.First("speaker", "id", id)
 	if err != nil {
 		return err
 	}
 	if existing == nil {
-		return ErrConsulClusterNotFound
+		return ErrSpeakerNotFound
 	}
-	err = txn.Delete("consulCluster", existing)
+	err = txn.Delete("speaker", existing)
 	if err != nil {
 		return err
 	}
@@ -218,29 +194,29 @@ func (s *Storer) DeleteConsulCluster(id string) error {
 	return nil
 }
 
-func (s *Storer) GetVaultCluster(id string) (VaultCluster, error) {
+func (s *Storer) GetWorkshop(id string) (Workshop, error) {
 	txn := s.db.Txn(false)
-	cluster, err := txn.First("vaultCluster", "id", id)
+	ap, err := txn.First("workshop", "id", id)
 	if err != nil {
-		return VaultCluster{}, err
+		return Workshop{}, err
 	}
-	if cluster == nil {
-		return VaultCluster{}, ErrVaultClusterNotFound
+	if ap == nil {
+		return Workshop{}, ErrWorkshopNotFound
 	}
-	return *cluster.(*VaultCluster), nil
+	return *ap.(*Workshop), nil
 }
 
-func (s *Storer) CreateVaultCluster(cluster VaultCluster) error {
+func (s *Storer) CreateWorkshop(ap Workshop) error {
 	txn := s.db.Txn(true)
 	defer txn.Abort()
-	exists, err := txn.First("vaultCluster", "id", cluster.ID)
+	exists, err := txn.First("workshop", "id", ap.ID)
 	if err != nil {
 		return err
 	}
 	if exists != nil {
-		return ErrVaultClusterAlreadyExists
+		return ErrWorkshopAlreadyExists
 	}
-	err = txn.Insert("vaultCluster", &cluster)
+	err = txn.Insert("workshop", &ap)
 	if err != nil {
 		return err
 	}
@@ -248,17 +224,17 @@ func (s *Storer) CreateVaultCluster(cluster VaultCluster) error {
 	return nil
 }
 
-func (s *Storer) UpdateVaultCluster(cluster VaultCluster) error {
+func (s *Storer) UpdateWorkshop(ap Workshop) error {
 	txn := s.db.Txn(true)
 	defer txn.Abort()
-	existing, err := txn.First("vaultCluster", "id", cluster.ID)
+	existing, err := txn.First("workshop", "id", ap.ID)
 	if err != nil {
 		return err
 	}
 	if existing == nil {
-		return ErrVaultClusterNotFound
+		return ErrWorkshopNotFound
 	}
-	err = txn.Insert("vaultCluster", &cluster)
+	err = txn.Insert("workshop", &ap)
 	if err != nil {
 		return err
 	}
@@ -266,149 +242,17 @@ func (s *Storer) UpdateVaultCluster(cluster VaultCluster) error {
 	return nil
 }
 
-func (s *Storer) DeleteVaultCluster(id string) error {
+func (s *Storer) DeleteWorkshop(id string) error {
 	txn := s.db.Txn(true)
 	defer txn.Abort()
-	existing, err := txn.First("vaultCluster", "id", id)
+	existing, err := txn.First("workshop", "id", id)
 	if err != nil {
 		return err
 	}
 	if existing == nil {
-		return ErrVaultClusterNotFound
+		return ErrWorkshopNotFound
 	}
-	err = txn.Delete("vaultCluster", existing)
-	if err != nil {
-		return err
-	}
-	txn.Commit()
-	return nil
-}
-
-func (s *Storer) GetNomadCluster(id string) (NomadCluster, error) {
-	txn := s.db.Txn(false)
-	cluster, err := txn.First("nomadCluster", "id", id)
-	if err != nil {
-		return NomadCluster{}, err
-	}
-	if cluster == nil {
-		return NomadCluster{}, ErrNomadClusterNotFound
-	}
-	return *cluster.(*NomadCluster), nil
-}
-
-func (s *Storer) CreateNomadCluster(cluster NomadCluster) error {
-	txn := s.db.Txn(true)
-	defer txn.Abort()
-	exists, err := txn.First("nomadCluster", "id", cluster.ID)
-	if err != nil {
-		return err
-	}
-	if exists != nil {
-		return ErrNomadClusterAlreadyExists
-	}
-	err = txn.Insert("nomadCluster", &cluster)
-	if err != nil {
-		return err
-	}
-	txn.Commit()
-	return nil
-}
-
-func (s *Storer) UpdateNomadCluster(cluster NomadCluster) error {
-	txn := s.db.Txn(true)
-	defer txn.Abort()
-	existing, err := txn.First("nomadCluster", "id", cluster.ID)
-	if err != nil {
-		return err
-	}
-	if existing == nil {
-		return ErrNomadClusterNotFound
-	}
-	err = txn.Insert("nomadCluster", &cluster)
-	if err != nil {
-		return err
-	}
-	txn.Commit()
-	return nil
-}
-
-func (s *Storer) DeleteNomadCluster(id string) error {
-	txn := s.db.Txn(true)
-	defer txn.Abort()
-	existing, err := txn.First("nomadCluster", "id", id)
-	if err != nil {
-		return err
-	}
-	if existing == nil {
-		return ErrNomadClusterNotFound
-	}
-	err = txn.Delete("nomadCluster", existing)
-	if err != nil {
-		return err
-	}
-	txn.Commit()
-	return nil
-}
-
-func (s *Storer) GetTerraformWorkspace(id string) (TerraformWorkspace, error) {
-	txn := s.db.Txn(false)
-	cluster, err := txn.First("terraformWorkspace", "id", id)
-	if err != nil {
-		return TerraformWorkspace{}, err
-	}
-	if cluster == nil {
-		return TerraformWorkspace{}, ErrTerraformWorkspaceNotFound
-	}
-	return *cluster.(*TerraformWorkspace), nil
-}
-
-func (s *Storer) CreateTerraformWorkspace(workspace TerraformWorkspace) error {
-	txn := s.db.Txn(true)
-	defer txn.Abort()
-	exists, err := txn.First("terraformWorkspace", "id", workspace.ID)
-	if err != nil {
-		return err
-	}
-	if exists != nil {
-		return ErrTerraformWorkspaceAlreadyExists
-	}
-	err = txn.Insert("terraformWorkspace", &workspace)
-	if err != nil {
-		return err
-	}
-	txn.Commit()
-	return nil
-}
-
-func (s *Storer) UpdateTerraformWorkspace(workspace TerraformWorkspace) error {
-	txn := s.db.Txn(true)
-	defer txn.Abort()
-	existing, err := txn.First("terraformWorkspace", "id", workspace.ID)
-	if err != nil {
-		return err
-	}
-	if existing == nil {
-		return ErrTerraformWorkspaceNotFound
-	}
-	err = txn.Insert("terraformWorkspace", &workspace)
-	if err != nil {
-		return err
-	}
-	txn.Commit()
-	return nil
-}
-
-func (s *Storer) DeleteTerraformWorkspace(id string) error {
-	txn := s.db.Txn(true)
-	defer txn.Abort()
-	existing, err := txn.First("terraformWorkspace", "id", id)
-	if err != nil {
-		return err
-	}
-	if existing == nil {
-		return ErrTerraformWorkspaceNotFound
-	}
-	err = txn.Delete("terraformWorkspace", existing)
+	err = txn.Delete("workshop", existing)
 	if err != nil {
 		return err
 	}
