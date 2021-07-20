@@ -119,14 +119,18 @@ func (s speakerResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest
 }
 
 func (s speakerResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
+	if err != nil {
+		// TODO: return error
+	}
 	var spkr speakerData
-	err := req.Plan.Get(ctx, &spkr)
+	err = req.Plan.Get(ctx, &spkr)
 	if err != nil {
 		// TODO: return error
 	}
 
 	_, err = s.client.Speakers.Update(ctx, hashitalks.Speaker{
-		ID:       spkr.ID.Value, // TODO: fixme
+		ID:       id.(types.String).Value,
 		Name:     spkr.Name,
 		Title:    spkr.Title,
 		Employer: spkr.Employer,
@@ -136,6 +140,7 @@ func (s speakerResource) Update(ctx context.Context, req tfsdk.UpdateResourceReq
 	if err != nil {
 		// TODO: return error
 	}
+	spkr.ID = id.(types.String)
 
 	err = resp.State.Set(ctx, &spkr)
 	if err != nil {
