@@ -5,8 +5,8 @@ provider "hashitalks" {
 terraform {
   required_providers {
     hashitalks = {
-      version = "0.1.0"
-      source  = "registry.terraform.io/hashicorp/hashitalks"
+      version = "0.6.0"
+      source  = "staging-registry.terraform.io/paddycarver/hashitalks"
     }
   }
 }
