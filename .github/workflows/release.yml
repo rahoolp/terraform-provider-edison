@@ -41,9 +41,11 @@ jobs:
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2.5.0
         with:
+          distribution: goreleaser-pro
           version: latest
           args: release --rm-dist
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           # GitHub sets this automatically
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
