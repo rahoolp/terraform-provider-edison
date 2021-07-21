@@ -16,7 +16,7 @@ import (
 type workshopResourceType struct {
 }
 
-func (w workshopResourceType) GetSchema(_ context.Context) (schema.Schema, []*tfprotov6.Diagnostic) {
+func (w workshopResourceType) GetSchema(ctx context.Context) (schema.Schema, []*tfprotov6.Diagnostic) {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": {
@@ -37,7 +37,7 @@ func (w workshopResourceType) GetSchema(_ context.Context) (schema.Schema, []*tf
 			},
 			"presenters": {
 				Required: true,
-				Attributes: schema.ListNestedAttributes(map[string]schema.Attribute{
+				Attributes: schema.MapNestedAttributes(map[string]schema.Attribute{
 					"title": {
 						Optional: true,
 						Type:     types.StringType,
@@ -50,7 +50,7 @@ func (w workshopResourceType) GetSchema(_ context.Context) (schema.Schema, []*tf
 						Optional: true,
 						Type:     types.StringType,
 					},
-				}, schema.ListNestedAttributesOptions{}),
+				}, schema.MapNestedAttributesOptions{}),
 			},
 			"meeting_info": {
 				Required: true,
