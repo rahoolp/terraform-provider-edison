@@ -54,8 +54,8 @@ github.com/hashicorp/go-uuid v1.0.2/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/b
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.4 h1:YDjusn29QI/Das2iO9M0BHnIbxPeyuCHsjMW+lJfyTc=
 github.com/hashicorp/golang-lru v0.5.4/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
-github.com/hashicorp/terraform-plugin-framework v0.1.0 h1:li4h0I2B+ylAdHBFwza3lbhDEhIoHuCBbsM+XrICBR4=
-github.com/hashicorp/terraform-plugin-framework v0.1.0/go.mod h1:JcYLIMJDUnOrPRSdbjRsNaJcOExNuPdZ6MS+OIBHjyE=
+github.com/hashicorp/terraform-plugin-framework v0.1.1-0.20210721014642-f89b01bbbf40 h1:ODLTVBOh7yLmN2WWEp1AaTK77grCzzPgjkvW3ZDD3Ns=
+github.com/hashicorp/terraform-plugin-framework v0.1.1-0.20210721014642-f89b01bbbf40/go.mod h1:JcYLIMJDUnOrPRSdbjRsNaJcOExNuPdZ6MS+OIBHjyE=
 github.com/hashicorp/terraform-plugin-go v0.3.1 h1:ML+THFcqpdR049gqrbEFDFo99va2Wqw9g4XDPy51euU=
 github.com/hashicorp/terraform-plugin-go v0.3.1/go.mod h1:dFHsQMaTLpON2gWhVWT96fvtlc/MF1vSy3OdMhWBzdM=
 github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb h1:b5rjCoWHc7eqmAS4/qyk21ZsHyb6Mxv/jykxvNTkU4M=
