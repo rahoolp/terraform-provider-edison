@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	hashitalks "github.com/hashicorp/terraform-provider-hashitalks/internal/client"
 
@@ -59,7 +60,13 @@ type speakerData struct {
 func (s speakerResourceType) NewResource(_ context.Context, p tfsdk.Provider) (tfsdk.Resource, []*tfprotov6.Diagnostic) {
 	prov, ok := p.(*provider)
 	if !ok {
-		// TODO: return an error
+		return nil, []*tfprotov6.Diagnostic{
+			{
+				Severity: tfprotov6.DiagnosticSeverityError,
+				Summary:  "Error converting provider",
+				Detail:   fmt.Sprintf("An unexpected error was encountered converting the provider. This is always a bug in the provider.\n\nType: %T", p),
+			},
+		}
 	}
 	return speakerResource{client: prov.client}, nil
 }
@@ -72,7 +79,12 @@ func (s speakerResource) Create(ctx context.Context, req tfsdk.CreateResourceReq
 	var spkr speakerData
 	err := req.Plan.Get(ctx, &spkr)
 	if err != nil {
-		// TODO: return error
+		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
+			Severity: tfprotov6.DiagnosticSeverityError,
+			Summary:  "Error parsing plan",
+			Detail:   "An unexpected error was encountered parsing the plan. This is always a bug in the provider.\n\nDetails: " + err.Error(),
+		})
+		return
 	}
 
 	speaker, err := s.client.Speakers.Create(ctx, hashitalks.Speaker{
