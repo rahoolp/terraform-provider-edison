@@ -53,6 +53,21 @@ func (a API) handlePostTalk(w http.ResponseWriter, r *http.Request) {
 		api.Encode(w, r, http.StatusInternalServerError, Response{Errors: api.ActOfGodError})
 		return
 	}
+	ap.Recordings = map[string]TalkRecording{}
+	for _, id := range ap.SpeakerIDs {
+		speaker, err := a.Storer.GetSpeaker(id)
+		if err != nil {
+			api.Encode(w, r, http.StatusInternalServerError, Response{Errors: api.ActOfGodError})
+			return
+		}
+		ap.Recordings[speaker.Name] = TalkRecording{
+			Codec: "h264",
+			Resolution: TalkRecordingResolution{
+				Width:  3840,
+				Height: 2160,
+			},
+		}
+	}
 	err = a.Storer.CreateTalk(ap)
 	if err != nil {
 		if err == ErrTalkAlreadyExists {
