@@ -117,6 +117,7 @@ func (s talkResource) Create(ctx context.Context, req tfsdk.CreateResourceReques
 		// TODO: return error
 	}
 	plan.ID = types.String{Value: talk.ID}
+	plan.Recordings = stateRecordings(talk.Recordings)
 
 	err = resp.State.Set(ctx, &plan)
 	if err != nil {
@@ -136,7 +137,65 @@ func (s talkResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, r
 		resp.State.RemoveResource(ctx)
 		return
 	}
-	recordings := types.Map{
+	err = resp.State.Set(ctx, &talkData{
+		ID:              types.String{Value: talk.ID},
+		Title:           talk.Title,
+		Description:     talk.Description,
+		DurationMinutes: talk.DurationMinutes,
+		Prerecorded:     talk.Prerecorded,
+		SpeakerIDs:      talk.SpeakerIDs,
+		Recordings:      stateRecordings(talk.Recordings),
+	})
+	if err != nil {
+		// TODO: return error
+	}
+}
+
+func (s talkResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
+	if err != nil {
+		// TODO: return error
+	}
+	var plan talkData
+	err = req.Plan.Get(ctx, &plan)
+	if err != nil {
+		// TODO: return error
+	}
+
+	talk, err := s.client.Talks.Update(ctx, hashitalks.Talk{
+		ID:              id.(types.String).Value,
+		Title:           plan.Title,
+		Description:     plan.Description,
+		DurationMinutes: plan.DurationMinutes,
+		Prerecorded:     plan.Prerecorded,
+		SpeakerIDs:      plan.SpeakerIDs,
+	})
+	if err != nil {
+		// TODO: return error
+	}
+	plan.ID = types.String{Value: talk.ID}
+	plan.Recordings = stateRecordings(talk.Recordings)
+
+	err = resp.State.Set(ctx, &plan)
+	if err != nil {
+		// TODO: return error
+	}
+}
+
+func (s talkResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
+	if err != nil {
+		// TODO: return error
+	}
+	err = s.client.Talks.Delete(ctx, id.(types.String).Value)
+	if err != nil && !errors.Is(err, hashitalks.ErrTalkNotFound) {
+		// TODO: return error
+	}
+	resp.State.RemoveResource(ctx)
+}
+
+func stateRecordings(recordings map[string]hashitalks.TalkRecording) types.Map {
+	res := types.Map{
 		ElemType: types.ObjectType{
 			AttrTypes: map[string]attr.Type{
 				"codec": types.StringType,
@@ -150,8 +209,8 @@ func (s talkResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, r
 		},
 		Elems: map[string]attr.Value{},
 	}
-	for user, recording := range talk.Recordings {
-		recordings.Elems[user] = types.Object{
+	for user, recording := range recordings {
+		res.Elems[user] = types.Object{
 			AttrTypes: map[string]attr.Type{
 				"codec": types.StringType,
 				"resolution": types.ObjectType{
@@ -176,57 +235,5 @@ func (s talkResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, r
 			},
 		}
 	}
-	err = resp.State.Set(ctx, &talkData{
-		ID:              types.String{Value: talk.ID},
-		Title:           talk.Title,
-		Description:     talk.Description,
-		DurationMinutes: talk.DurationMinutes,
-		Prerecorded:     talk.Prerecorded,
-		SpeakerIDs:      talk.SpeakerIDs,
-		Recordings:      recordings,
-	})
-	if err != nil {
-		// TODO: return error
-	}
-}
-
-func (s talkResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
-	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
-	if err != nil {
-		// TODO: return error
-	}
-	var plan talkData
-	err = req.Plan.Get(ctx, &plan)
-	if err != nil {
-		// TODO: return error
-	}
-
-	_, err = s.client.Talks.Update(ctx, hashitalks.Talk{
-		ID:              id.(types.String).Value,
-		Title:           plan.Title,
-		Description:     plan.Description,
-		DurationMinutes: plan.DurationMinutes,
-		Prerecorded:     plan.Prerecorded,
-		SpeakerIDs:      plan.SpeakerIDs,
-	})
-	if err != nil {
-		// TODO: return error
-	}
-
-	err = resp.State.Set(ctx, &plan)
-	if err != nil {
-		// TODO: return error
-	}
-}
-
-func (s talkResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
-	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
-	if err != nil {
-		// TODO: return error
-	}
-	err = s.client.Talks.Delete(ctx, id.(types.String).Value)
-	if err != nil && !errors.Is(err, hashitalks.ErrTalkNotFound) {
-		// TODO: return error
-	}
-	resp.State.RemoveResource(ctx)
+	return res
 }
