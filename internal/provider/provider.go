@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
 func New() tfsdk.Provider {
@@ -20,7 +21,7 @@ type provider struct {
 	client *hashitalks.Client
 }
 
-func (p provider) GetSchema(_ context.Context) (schema.Schema, []*tfprotov6.Diagnostic) {
+func (p *provider) GetSchema(_ context.Context) (schema.Schema, []*tfprotov6.Diagnostic) {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"api_endpoint": {
@@ -40,17 +41,34 @@ type providerData struct {
 	Token    types.String `tfsdk:"token"`
 }
 
-func (p provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderRequest, resp *tfsdk.ConfigureProviderResponse) {
+func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderRequest, resp *tfsdk.ConfigureProviderResponse) {
 	var config providerData
 	err := req.Config.Get(ctx, &config)
 	if err != nil {
-		// TODO: return error
+		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
+			Severity: tfprotov6.DiagnosticSeverityError,
+			Summary:  "Error parsing plan",
+			Detail:   "An unexpected error was encountered parsing the plan. This is always a bug in the provider.\n\nDetails: " + err.Error(),
+		})
+		return
 	}
 	if config.Endpoint.Unknown {
-		// TODO: return error
+		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
+			Severity:  tfprotov6.DiagnosticSeverityError,
+			Summary:   "Can't interpolate into provider block",
+			Detail:    "Interpolating that value into the provider block doesn't give the provider enough information to run. Try hard-coding the value, instead.",
+			Attribute: tftypes.NewAttributePath().WithAttributeName("api_endpoint"),
+		})
+		return
 	}
 	if config.Token.Unknown {
-		// TODO: return error
+		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
+			Severity:  tfprotov6.DiagnosticSeverityError,
+			Summary:   "Can't interpolate into provider block",
+			Detail:    "Interpolating that value into the provider block doesn't give the provider enough information to run. Try hard-coding the value, instead.",
+			Attribute: tftypes.NewAttributePath().WithAttributeName("token"),
+		})
+		return
 	}
 	if config.Endpoint.Null {
 		config.Endpoint.Value = os.Getenv("HASHITALKS_API_ENDPOINT")
@@ -59,22 +77,43 @@ func (p provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderRequ
 		config.Token.Value = os.Getenv("HASHITALKS_TOKEN")
 	}
 	if config.Endpoint.Value == "" {
-		// TODO: return error
+		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
+			Severity:  tfprotov6.DiagnosticSeverityError,
+			Summary:   "Invalid provider config",
+			Detail:    "api_endpoint must be set.",
+			Attribute: tftypes.NewAttributePath().WithAttributeName("api_endpoint"),
+		})
+		return
 	}
 	if config.Token.Value == "" {
-		// TODO: return error
+		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
+			Severity:  tfprotov6.DiagnosticSeverityError,
+			Summary:   "Invalid provider config",
+			Detail:    "token must be set.",
+			Attribute: tftypes.NewAttributePath().WithAttributeName("token"),
+		})
+		return
 	}
 	client, err := hashitalks.NewClient(config.Endpoint.Value, config.Token.Value)
 	if err != nil {
-		// TODO: return error
+		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
+			Severity: tfprotov6.DiagnosticSeverityError,
+			Summary:  "Error creating client",
+			Detail:   "An unexpected error was encountered creating an API client.\n\nDetails: " + err.Error(),
+		})
+		return
 	}
 	p.client = client
 }
 
-func (p provider) GetResources(_ context.Context) (map[string]tfsdk.ResourceType, []*tfprotov6.Diagnostic) {
-	return map[string]tfsdk.ResourceType{}, nil
+func (p *provider) GetResources(_ context.Context) (map[string]tfsdk.ResourceType, []*tfprotov6.Diagnostic) {
+	return map[string]tfsdk.ResourceType{
+		"hashitalks_speaker":  speakerResourceType{},
+		"hashitalks_talk":     talkResourceType{},
+		"hashitalks_workshop": workshopResourceType{},
+	}, nil
 }
 
-func (p provider) GetDataSources(_ context.Context) (map[string]tfsdk.DataSourceType, []*tfprotov6.Diagnostic) {
+func (p *provider) GetDataSources(_ context.Context) (map[string]tfsdk.DataSourceType, []*tfprotov6.Diagnostic) {
 	return map[string]tfsdk.DataSourceType{}, nil
 }
