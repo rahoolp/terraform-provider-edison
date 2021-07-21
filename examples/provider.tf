@@ -1,13 +1,12 @@
-provider "dadcorp" {
-  username = "admin"
-  password = "hunter2"
+provider "hashitalks" {
+  api_endpoint = "http://localhost:12345/"
 }
 
 terraform {
   required_providers {
-    dadcorp = {
-      versions = ["0.1.0"]
-      source   = "registry.terraform.io/dadcorp/dadcorp"
+    hashitalks = {
+      version = "0.1.0"
+      source  = "registry.terraform.io/hashicorp/hashitalks"
     }
   }
 }
