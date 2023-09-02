@@ -5,7 +5,7 @@ import (
 	"errors"
 	"math/big"
 
-	hashitalks "github.com/hashicorp/terraform-provider-hashitalks/internal/client"
+	hashitalks "github.com/rahoolp/terraform-provider-edison/internal/client"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/schema"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	hashitalks "github.com/hashicorp/terraform-provider-hashitalks/internal/client"
+	hashitalks "github.com/rahoolp/terraform-provider-edison/internal/client"
 
 	"github.com/hashicorp/terraform-plugin-framework/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"

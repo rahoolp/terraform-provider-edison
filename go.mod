@@ -1,4 +1,4 @@
-module github.com/hashicorp/terraform-provider-hashitalks
+module terraform-provider-edison
 
 go 1.16
 
