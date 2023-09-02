@@ -1,4 +1,4 @@
-resource "hashitalks_speaker" "brian" {
+resource "edison_speaker" "brian" {
   name     = "Brian Flad"
   title    = "Sr. Software Engineer"
   employer = "HashiCorp"
@@ -6,14 +6,14 @@ resource "hashitalks_speaker" "brian" {
   photo    = "brian.jpg"
 }
 
-resource "hashitalks_speaker" "katy" {
+resource "edison_speaker" "katy" {
   name     = "Katy Moe"
   title    = "Sr. Software Engineer"
   employer = "HashiCorp"
   pronouns = "she/her"
 }
 
-resource "hashitalks_speaker" "paddy" {
+resource "edison_speaker" "paddy" {
   name     = "Paddy Carver"
   title    = "Engineering Lead"
   employer = "HashiCorp"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	hashitalks "github.com/rahoolp/terraform-provider-edison/internal/client"
+	edison "github.com/rahoolp/terraform-provider-edison/internal/client"
 
 	"github.com/hashicorp/terraform-plugin-framework/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -18,7 +18,7 @@ func New() tfsdk.Provider {
 }
 
 type provider struct {
-	client *hashitalks.Client
+	client *edison.Client
 }
 
 func (p *provider) GetSchema(_ context.Context) (schema.Schema, []*tfprotov6.Diagnostic) {
@@ -71,10 +71,10 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 		return
 	}
 	if config.Endpoint.Null {
-		config.Endpoint.Value = os.Getenv("HASHITALKS_API_ENDPOINT")
+		config.Endpoint.Value = os.Getenv("edison_API_ENDPOINT")
 	}
 	if config.Token.Null {
-		config.Token.Value = os.Getenv("HASHITALKS_TOKEN")
+		config.Token.Value = os.Getenv("edison_TOKEN")
 	}
 	if config.Endpoint.Value == "" {
 		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
@@ -94,7 +94,7 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 		})
 		return
 	}
-	client, err := hashitalks.NewClient(config.Endpoint.Value, config.Token.Value)
+	client, err := edison.NewClient(config.Endpoint.Value, config.Token.Value)
 	if err != nil {
 		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
 			Severity: tfprotov6.DiagnosticSeverityError,
@@ -108,9 +108,9 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 
 func (p *provider) GetResources(_ context.Context) (map[string]tfsdk.ResourceType, []*tfprotov6.Diagnostic) {
 	return map[string]tfsdk.ResourceType{
-		"hashitalks_speaker":  speakerResourceType{},
-		"hashitalks_talk":     talkResourceType{},
-		"hashitalks_workshop": workshopResourceType{},
+		"edison_speaker":  speakerResourceType{},
+		"edison_talk":     talkResourceType{},
+		"edison_workshop": workshopResourceType{},
 	}, nil
 }
 

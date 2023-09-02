@@ -1,4 +1,4 @@
-resource "hashitalks_workshop" "provider" {
+resource "edison_workshop" "provider" {
   title            = "Building Your First Provider"
   description      = "Learn to build your very first provider with the new Terraform Plugin Framework."
   duration_minutes = 120

@@ -1,4 +1,4 @@
-module terraform-provider-edison
+module github.com/rahoolp/terraform-provider-edison
 
 go 1.16
 
