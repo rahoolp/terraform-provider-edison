@@ -5,7 +5,7 @@ import (
 	"errors"
 	"math/big"
 
-	hashitalks "github.com/rahoolp/terraform-provider-edison/internal/client"
+	edison "github.com/rahoolp/terraform-provider-edison/internal/client"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/schema"
@@ -96,7 +96,7 @@ func (s talkResourceType) NewResource(_ context.Context, p tfsdk.Provider) (tfsd
 }
 
 type talkResource struct {
-	client *hashitalks.Client
+	client *edison.Client
 }
 
 func (s talkResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
@@ -106,7 +106,7 @@ func (s talkResource) Create(ctx context.Context, req tfsdk.CreateResourceReques
 		// TODO: return error
 	}
 
-	talk, err := s.client.Talks.Create(ctx, hashitalks.Talk{
+	talk, err := s.client.Talks.Create(ctx, edison.Talk{
 		Title:           plan.Title,
 		Description:     plan.Description,
 		DurationMinutes: plan.DurationMinutes,
@@ -131,9 +131,9 @@ func (s talkResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, r
 		// TODO: return error
 	}
 	talk, err := s.client.Talks.Get(ctx, id.(types.String).Value)
-	if err != nil && !errors.Is(err, hashitalks.ErrTalkNotFound) {
+	if err != nil && !errors.Is(err, edison.ErrTalkNotFound) {
 		// TODO: return error
-	} else if errors.Is(err, hashitalks.ErrTalkNotFound) {
+	} else if errors.Is(err, edison.ErrTalkNotFound) {
 		resp.State.RemoveResource(ctx)
 		return
 	}
@@ -162,7 +162,7 @@ func (s talkResource) Update(ctx context.Context, req tfsdk.UpdateResourceReques
 		// TODO: return error
 	}
 
-	talk, err := s.client.Talks.Update(ctx, hashitalks.Talk{
+	talk, err := s.client.Talks.Update(ctx, edison.Talk{
 		ID:              id.(types.String).Value,
 		Title:           plan.Title,
 		Description:     plan.Description,
@@ -188,13 +188,13 @@ func (s talkResource) Delete(ctx context.Context, req tfsdk.DeleteResourceReques
 		// TODO: return error
 	}
 	err = s.client.Talks.Delete(ctx, id.(types.String).Value)
-	if err != nil && !errors.Is(err, hashitalks.ErrTalkNotFound) {
+	if err != nil && !errors.Is(err, edison.ErrTalkNotFound) {
 		// TODO: return error
 	}
 	resp.State.RemoveResource(ctx)
 }
 
-func stateRecordings(recordings map[string]hashitalks.TalkRecording) types.Map {
+func stateRecordings(recordings map[string]edison.TalkRecording) types.Map {
 	res := types.Map{
 		ElemType: types.ObjectType{
 			AttrTypes: map[string]attr.Type{

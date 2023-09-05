@@ -1,4 +1,4 @@
-package hashitalks
+package edison
 
 import (
 	"context"
@@ -19,6 +19,7 @@ type Client struct {
 	Speakers  *SpeakersService
 	Talks     *TalksService
 	Workshops *WorkshopsService
+	EAStores  *EAStoresService
 }
 
 func NewClient(baseURL, token string) (*Client, error) {
@@ -34,6 +35,7 @@ func NewClient(baseURL, token string) (*Client, error) {
 	c.Speakers = newSpeakersService("speakers", c)
 	c.Talks = newTalksService("talks", c)
 	c.Workshops = newWorkshopsService("workshops", c)
+	c.EAStores = newEAStoreService("eastores", c)
 	return c, nil
 }
 

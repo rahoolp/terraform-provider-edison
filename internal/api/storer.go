@@ -13,6 +13,9 @@ var (
 	ErrSpeakerAlreadyExists  = errors.New("speaker already exists")
 	ErrWorkshopNotFound      = errors.New("workshop  not found")
 	ErrWorkshopAlreadyExists = errors.New("workshop already exists")
+
+	ErrEAStoreNotFound      = errors.New("EAStore  not found")
+	ErrEAStoreAlreadyExists = errors.New("EAStore already exists")
 )
 
 type Storer struct {
@@ -44,6 +47,16 @@ func NewStorer() (*Storer, error) {
 			},
 			"workshop": {
 				Name: "workshop",
+				Indexes: map[string]*memdb.IndexSchema{
+					"id": {
+						Name:    "id",
+						Unique:  true,
+						Indexer: &memdb.StringFieldIndex{Field: "ID", Lowercase: true},
+					},
+				},
+			},
+			"eastore": {
+				Name: "eastore",
 				Indexes: map[string]*memdb.IndexSchema{
 					"id": {
 						Name:    "id",
@@ -253,6 +266,72 @@ func (s *Storer) DeleteWorkshop(id string) error {
 		return ErrWorkshopNotFound
 	}
 	err = txn.Delete("workshop", existing)
+	if err != nil {
+		return err
+	}
+	txn.Commit()
+	return nil
+}
+
+func (s *Storer) GetEAStore(id string) (EAStore, error) {
+	txn := s.db.Txn(false)
+	ap, err := txn.First("eastore", "id", id)
+	if err != nil {
+		return EAStore{}, err
+	}
+	if ap == nil {
+		return EAStore{}, ErrEAStoreNotFound
+	}
+	return *ap.(*EAStore), nil
+}
+
+func (s *Storer) CreateEAStore(ap EAStore) error {
+	txn := s.db.Txn(true)
+	defer txn.Abort()
+	exists, err := txn.First("eastore", "id", ap.ID)
+	if err != nil {
+		return err
+	}
+	if exists != nil {
+		return ErrEAStoreAlreadyExists
+	}
+	err = txn.Insert("eastore", &ap)
+	if err != nil {
+		return err
+	}
+	txn.Commit()
+	return nil
+}
+
+func (s *Storer) UpdateEAStore(ap EAStore) error {
+	txn := s.db.Txn(true)
+	defer txn.Abort()
+	existing, err := txn.First("eastore", "id", ap.ID)
+	if err != nil {
+		return err
+	}
+	if existing == nil {
+		return ErrEAStoreNotFound
+	}
+	err = txn.Insert("eastore", &ap)
+	if err != nil {
+		return err
+	}
+	txn.Commit()
+	return nil
+}
+
+func (s *Storer) DeleteEAStore(id string) error {
+	txn := s.db.Txn(true)
+	defer txn.Abort()
+	existing, err := txn.First("eastore", "id", id)
+	if err != nil {
+		return err
+	}
+	if existing == nil {
+		return ErrEAStoreNotFound
+	}
+	err = txn.Delete("eastore", existing)
 	if err != nil {
 		return err
 	}

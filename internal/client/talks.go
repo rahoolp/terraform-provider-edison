@@ -1,4 +1,4 @@
-package hashitalks
+package edison
 
 import (
 	"bytes"

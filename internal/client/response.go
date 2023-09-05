@@ -1,4 +1,4 @@
-package hashitalks
+package edison
 
 import (
 	"encoding/json"
@@ -31,6 +31,7 @@ type Response struct {
 	Workshops []Workshop    `json:"workshops,omitempty"`
 	Errors    RequestErrors `json:"errors,omitempty"`
 	Status    int           `json:"-"`
+	EAStores  []EAStore     `json:"eastores,omitempty"`
 }
 
 func responseFromBody(resp *http.Response) (Response, error) {

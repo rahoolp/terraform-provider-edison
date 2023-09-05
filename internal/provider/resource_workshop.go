@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	hashitalks "github.com/rahoolp/terraform-provider-edison/internal/client"
+	edison "github.com/rahoolp/terraform-provider-edison/internal/client"
 
 	"github.com/hashicorp/terraform-plugin-framework/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -99,7 +99,7 @@ func (w workshopResourceType) NewResource(_ context.Context, p tfsdk.Provider) (
 }
 
 type workshopResource struct {
-	client *hashitalks.Client
+	client *edison.Client
 }
 
 func (w workshopResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
@@ -109,21 +109,21 @@ func (w workshopResource) Create(ctx context.Context, req tfsdk.CreateResourceRe
 		// TODO: return error
 	}
 
-	presenters := map[string]hashitalks.WorkshopPresenter{}
+	presenters := map[string]edison.WorkshopPresenter{}
 	for name, info := range plan.Presenters {
-		presenters[name] = hashitalks.WorkshopPresenter{
+		presenters[name] = edison.WorkshopPresenter{
 			Title:    info.Title,
 			Employer: info.Employer,
 			Pronouns: info.Pronouns,
 		}
 	}
 
-	workshop, err := w.client.Workshops.Create(ctx, hashitalks.Workshop{
+	workshop, err := w.client.Workshops.Create(ctx, edison.Workshop{
 		Title:           plan.Title,
 		Description:     plan.Description,
 		DurationMinutes: plan.DurationMinutes,
 		Presenters:      presenters,
-		MeetingInfo: hashitalks.WorkshopMeetingInfo{
+		MeetingInfo: edison.WorkshopMeetingInfo{
 			URL:      plan.MeetingInfo.URL,
 			Password: plan.MeetingInfo.Password,
 		},
@@ -145,9 +145,9 @@ func (w workshopResource) Read(ctx context.Context, req tfsdk.ReadResourceReques
 		// TODO: return error
 	}
 	workshop, err := w.client.Workshops.Get(ctx, id.(types.String).Value)
-	if err != nil && !errors.Is(err, hashitalks.ErrWorkshopNotFound) {
+	if err != nil && !errors.Is(err, edison.ErrWorkshopNotFound) {
 		// TODO: return error
-	} else if errors.Is(err, hashitalks.ErrWorkshopNotFound) {
+	} else if errors.Is(err, edison.ErrWorkshopNotFound) {
 		resp.State.RemoveResource(ctx)
 		return
 	}
@@ -188,22 +188,22 @@ func (w workshopResource) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 		// TODO: return error
 	}
 
-	presenters := map[string]hashitalks.WorkshopPresenter{}
+	presenters := map[string]edison.WorkshopPresenter{}
 	for name, info := range plan.Presenters {
-		presenters[name] = hashitalks.WorkshopPresenter{
+		presenters[name] = edison.WorkshopPresenter{
 			Title:    info.Title,
 			Employer: info.Employer,
 			Pronouns: info.Pronouns,
 		}
 	}
 
-	_, err = w.client.Workshops.Update(ctx, hashitalks.Workshop{
+	_, err = w.client.Workshops.Update(ctx, edison.Workshop{
 		ID:              id.(types.String).Value,
 		Title:           plan.Title,
 		Description:     plan.Description,
 		DurationMinutes: plan.DurationMinutes,
 		Presenters:      presenters,
-		MeetingInfo: hashitalks.WorkshopMeetingInfo{
+		MeetingInfo: edison.WorkshopMeetingInfo{
 			URL:      plan.MeetingInfo.URL,
 			Password: plan.MeetingInfo.Password,
 		},
@@ -226,7 +226,7 @@ func (w workshopResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRe
 		// TODO: return error
 	}
 	err = w.client.Workshops.Delete(ctx, id.(types.String).Value)
-	if err != nil && !errors.Is(err, hashitalks.ErrWorkshopNotFound) {
+	if err != nil && !errors.Is(err, edison.ErrWorkshopNotFound) {
 		// TODO: return error
 	}
 	resp.State.RemoveResource(ctx)

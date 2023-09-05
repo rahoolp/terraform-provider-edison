@@ -30,7 +30,7 @@ func (p *provider) GetSchema(_ context.Context) (schema.Schema, []*tfprotov6.Dia
 			},
 			"token": {
 				Type:     types.StringType,
-				Optional: true,
+				Optional: true, //so that we can allow for enviornment variables as well
 			},
 		},
 	}, nil
@@ -71,10 +71,10 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 		return
 	}
 	if config.Endpoint.Null {
-		config.Endpoint.Value = os.Getenv("edison_API_ENDPOINT")
+		config.Endpoint.Value = os.Getenv("EDISON_API_ENDPOINT")
 	}
 	if config.Token.Null {
-		config.Token.Value = os.Getenv("edison_TOKEN")
+		config.Token.Value = os.Getenv("EDISON_TOKEN")
 	}
 	if config.Endpoint.Value == "" {
 		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
@@ -111,6 +111,7 @@ func (p *provider) GetResources(_ context.Context) (map[string]tfsdk.ResourceTyp
 		"edison_speaker":  speakerResourceType{},
 		"edison_talk":     talkResourceType{},
 		"edison_workshop": workshopResourceType{},
+		"edison_eastore":  eastoreResourceType{},
 	}, nil
 }
 

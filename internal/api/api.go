@@ -30,6 +30,11 @@ func (a API) Server(baseURL string) http.Handler {
 	router.Endpoint("/workshops/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutWorkshop))
 	router.Endpoint("/workshops/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteWorkshop))
 
+	router.Endpoint("/eastores").Methods(http.MethodPost).Handler(http.HandlerFunc(a.handlePostEAStore))
+	router.Endpoint("/eastores/{id}").Methods(http.MethodGet).Handler(http.HandlerFunc(a.handleGetEAStore))
+	router.Endpoint("/eastores/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutEAStore))
+	router.Endpoint("/eastores/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteEAStore))
+
 	return api.NegotiateMiddleware(router)
 }
 
@@ -43,4 +48,5 @@ type Response struct {
 	Workshops []Workshop         `json:"workshops,omitempty"`
 	Errors    []api.RequestError `json:"errors,omitempty"`
 	Status    int                `json:"-"`
+	EAStores  []EAStore          `json:"eastores,omitempty"`
 }

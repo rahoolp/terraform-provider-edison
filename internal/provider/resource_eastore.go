@@ -13,33 +13,37 @@ import (
 	edison "github.com/rahoolp/terraform-provider-edison/internal/client"
 )
 
-type speakerResourceType struct {
+type eastoreResourceType struct {
 }
 
-func (s speakerResourceType) GetSchema(_ context.Context) (schema.Schema, []*tfprotov6.Diagnostic) {
+func (e eastoreResourceType) GetSchema(_ context.Context) (schema.Schema, []*tfprotov6.Diagnostic) {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": {
 				Type:     types.StringType,
 				Computed: true,
 			},
-			"name": {
-				Type:     types.StringType,
+			"partition_space_tb": {
+				Type:     types.NumberType,
 				Required: true,
 			},
-			"title": {
+			"ip_address": {
 				Type:     types.StringType,
 				Optional: true,
 			},
-			"employer": {
+			"ip_port": {
 				Type:     types.StringType,
 				Optional: true,
 			},
-			"pronouns": {
+			"aet": {
 				Type:     types.StringType,
 				Optional: true,
 			},
-			"photo": {
+			"created_at": {
+				Type:     types.StringType,
+				Optional: true,
+			},
+			"updated_at": {
 				Type:     types.StringType,
 				Optional: true,
 			},
@@ -47,16 +51,17 @@ func (s speakerResourceType) GetSchema(_ context.Context) (schema.Schema, []*tfp
 	}, nil
 }
 
-type speakerData struct {
-	ID       types.String `tfsdk:"id"`
-	Name     string       `tfsdk:"name"`
-	Title    *string      `tfsdk:"title"`
-	Employer *string      `tfsdk:"employer"`
-	Pronouns *string      `tfsdk:"pronouns"`
-	Photo    *string      `tfsdk:"photo"`
+type eastoreData struct {
+	ID               types.String `tfsdk:"id"`
+	PartitionSpaceTB int64        `tfsdk:"partition_space_tb"`
+	IPAddress        *string      `tfsdk:"ip_address"`
+	IPPort           *string      `tfsdk:"ip_port"`
+	AET              *string      `tfsdk:"aet"`
+	CreatedAt        *string      `tfsdk:"created_at"`
+	UpdatedAt        *string      `tfsdk:"updated_at"`
 }
 
-func (s speakerResourceType) NewResource(_ context.Context, p tfsdk.Provider) (tfsdk.Resource, []*tfprotov6.Diagnostic) {
+func (s eastoreResourceType) NewResource(_ context.Context, p tfsdk.Provider) (tfsdk.Resource, []*tfprotov6.Diagnostic) {
 	prov, ok := p.(*provider)
 	if !ok {
 		return nil, []*tfprotov6.Diagnostic{
@@ -70,13 +75,13 @@ func (s speakerResourceType) NewResource(_ context.Context, p tfsdk.Provider) (t
 	return eastoreResource{client: prov.client}, nil
 }
 
-type speakerResource struct {
+type eastoreResource struct {
 	client *edison.Client
 }
 
-func (s speakerResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
-	var spkr speakerData
-	err := req.Plan.Get(ctx, &spkr)
+func (e eastoreResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+	var eastr eastoreData
+	err := req.Plan.Get(ctx, &eastr)
 	if err != nil {
 		resp.Diagnostics = append(resp.Diagnostics, &tfprotov6.Diagnostic{
 			Severity: tfprotov6.DiagnosticSeverityError,
@@ -86,25 +91,26 @@ func (s speakerResource) Create(ctx context.Context, req tfsdk.CreateResourceReq
 		return
 	}
 
-	speaker, err := s.client.Speakers.Create(ctx, edison.Speaker{
-		Name:     spkr.Name,
-		Title:    spkr.Title,
-		Employer: spkr.Employer,
-		Pronouns: spkr.Pronouns,
-		Photo:    spkr.Photo,
+	eastore, err := e.client.EAStores.Create(ctx, edison.EAStore{
+		PartitionSpaceTB: eastr.PartitionSpaceTB,
+		IPAddress:        eastr.IPAddress,
+		IPPort:           eastr.IPPort,
+		AET:              eastr.AET,
+		CreatedAt:        eastr.CreatedAt,
+		UpdatedAt:        eastr.UpdatedAt,
 	})
 	if err != nil {
 		// TODO: return error
 	}
-	spkr.ID = types.String{Value: speaker.ID}
+	eastr.ID = types.String{Value: eastore.ID}
 
-	err = resp.State.Set(ctx, &spkr)
+	err = resp.State.Set(ctx, &eastr)
 	if err != nil {
 		// TODO: return error
 	}
 }
 
-func (s speakerResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (s eastoreResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
 	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
 	if err != nil {
 		// TODO: return error
@@ -129,7 +135,7 @@ func (s speakerResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest
 	}
 }
 
-func (s speakerResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (e eastoreResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
 	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
 	if err != nil {
 		// TODO: return error
@@ -140,7 +146,7 @@ func (s speakerResource) Update(ctx context.Context, req tfsdk.UpdateResourceReq
 		// TODO: return error
 	}
 
-	_, err = s.client.Speakers.Update(ctx, edison.Speaker{
+	_, err = e.client.Speakers.Update(ctx, edison.Speaker{
 		ID:       id.(types.String).Value,
 		Name:     spkr.Name,
 		Title:    spkr.Title,
@@ -159,12 +165,12 @@ func (s speakerResource) Update(ctx context.Context, req tfsdk.UpdateResourceReq
 	}
 }
 
-func (s speakerResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (e eastoreResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
 	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
 	if err != nil {
 		// TODO: return error
 	}
-	err = s.client.Speakers.Delete(ctx, id.(types.String).Value)
+	err = e.client.Speakers.Delete(ctx, id.(types.String).Value)
 	if err != nil && !errors.Is(err, edison.ErrSpeakerNotFound) {
 		// TODO: return error
 	}
