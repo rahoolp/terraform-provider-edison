@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	ErrEAStoreNotFound = errors.New("speaker not found")
+	ErrEAStoreNotFound = errors.New("eastore not found")
 )
 
 type EAStoresService struct {
@@ -29,7 +29,7 @@ func newEAStoreService(basePath string, client *Client) *EAStoresService {
 type EAStore struct {
 	ID               string `json:"id,omitempty"`
 	PartitionSpaceTB int64  `json:"partition_space_tb"`
-	IPAddress        string `json:"ip_address,omitempty"` //* allows for null, aka null value
+	IPAddress        string `json:"ip_address,omitempty"` //omitempty allows for null, aka null value
 	IPPort           string `json:"ip_port,omitempty"`
 	AET              string `json:"aet,omitempty"`
 	CreatedAt        string `json:"created_at,omitempty"`
@@ -41,10 +41,10 @@ func (s EAStoresService) buildURL(p string) string {
 	return path.Join(s.basePath, p)
 }
 
-func (s EAStoresService) Create(ctx context.Context, speaker EAStore) (EAStore, error) {
-	b, err := json.Marshal(speaker)
+func (s EAStoresService) Create(ctx context.Context, eastore EAStore) (EAStore, error) {
+	b, err := json.Marshal(eastore)
 	if err != nil {
-		return EAStore{}, fmt.Errorf("error serialising speaker: %w", err)
+		return EAStore{}, fmt.Errorf("error serialising eastore: %w", err)
 	}
 	buf := bytes.NewBuffer(b)
 	req, err := s.client.NewRequest(ctx, http.MethodPost, s.buildURL("/"), buf)
@@ -122,16 +122,16 @@ func (s EAStoresService) Get(ctx context.Context, id string) (EAStore, error) {
 	return resp.EAStores[0], nil
 }
 
-func (s EAStoresService) Update(ctx context.Context, speaker EAStore) (EAStore, error) {
-	if speaker.ID == "" {
+func (s EAStoresService) Update(ctx context.Context, eastore EAStore) (EAStore, error) {
+	if eastore.ID == "" {
 		return EAStore{}, errors.New("id must be specified")
 	}
-	b, err := json.Marshal(speaker)
+	b, err := json.Marshal(eastore)
 	if err != nil {
 		return EAStore{}, fmt.Errorf("error serialising EA Store: %w", err)
 	}
 	buf := bytes.NewBuffer(b)
-	req, err := s.client.NewRequest(ctx, http.MethodPut, s.buildURL("/"+speaker.ID), buf)
+	req, err := s.client.NewRequest(ctx, http.MethodPut, s.buildURL("/"+eastore.ID), buf)
 	if err != nil {
 		return EAStore{}, fmt.Errorf("error constructing request: %w", err)
 	}

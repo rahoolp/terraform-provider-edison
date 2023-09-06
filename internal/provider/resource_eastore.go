@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -81,6 +82,9 @@ type eastoreResource struct {
 }
 
 func (e eastoreResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+
+	tflog.Info(ctx, "EA Store Create..")
+
 	var eastr eastoreData
 	err := req.Plan.Get(ctx, &eastr)
 	if err != nil {
@@ -96,8 +100,9 @@ func (e eastoreResource) Create(ctx context.Context, req tfsdk.CreateResourceReq
 	var ipAddress string = "192.168.1.1"
 	var ipPort string = "4242"
 	var aet string = "AET1"
-	var createdAt string = "2023-01-01T00:00:00Z"
-	var updatedAt string = "2023-01-01T00:00:00Z"
+	now := time.Now()
+	var createdAt string = now.Format("2006-01-02 15:04:05")
+	var updatedAt string = now.Format("2006-01-02 15:04:05")
 
 	eastore, err := e.client.EAStores.Create(ctx, edison.EAStore{
 		ID:               id,
@@ -109,8 +114,7 @@ func (e eastoreResource) Create(ctx context.Context, req tfsdk.CreateResourceReq
 		UpdatedAt:        updatedAt,
 	})
 	if err != nil {
-		// TODO: return error
-		tflog.Info(ctx, err.Error())
+		tflog.Info(ctx, "EA Store Create: "+err.Error())
 	}
 
 	eastr.ID = types.String{Value: eastore.ID}
@@ -123,19 +127,22 @@ func (e eastoreResource) Create(ctx context.Context, req tfsdk.CreateResourceReq
 
 	err = resp.State.Set(ctx, &eastr)
 	if err != nil {
-		// TODO: return error
-		tflog.Info(ctx, err.Error())
+		tflog.Info(ctx, "EA Store Create: "+err.Error())
 	}
 }
 
 func (e eastoreResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+
+	tflog.Info(ctx, "EA Store Read..")
+
 	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
 	if err != nil {
-		// TODO: return error
+		tflog.Info(ctx, "EA Store Read: "+err.Error())
 	}
+
 	eastr, err := e.client.EAStores.Get(ctx, id.(types.String).Value)
 	if err != nil && !errors.Is(err, edison.ErrSpeakerNotFound) {
-		// TODO: return error
+		tflog.Info(ctx, "EA Store Read: "+err.Error())
 	} else if errors.Is(err, edison.ErrSpeakerNotFound) {
 		resp.State.RemoveResource(ctx)
 		return
@@ -152,52 +159,59 @@ func (e eastoreResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest
 	})
 
 	if err != nil {
-		// TODO: return error
-		tflog.Info(ctx, err.Error())
+		tflog.Info(ctx, "EA Store: "+err.Error())
 	}
 }
 
 func (e eastoreResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+
+	tflog.Info(ctx, "EA Store Update..")
+
 	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
 	if err != nil {
-		// TODO: return error
+		tflog.Info(ctx, "EA Store Update: "+err.Error())
 	}
+
 	var eastr eastoreData
 	err = req.Plan.Get(ctx, &eastr)
 	if err != nil {
-		// TODO: return error
+		tflog.Info(ctx, "EA Store Update: "+err.Error())
 	}
+
+	now := time.Now()
+	var updatedAt string = now.Format("2006-01-02 15:04:05")
 
 	_, err = e.client.EAStores.Update(ctx, edison.EAStore{
 		ID:               id.(types.String).Value,
 		PartitionSpaceTB: eastr.PartitionSpaceTB,
-		// IPAddress:        eastr.IPAddress,
-		// IPPort:           eastr.IPPort,
-		// AET:              eastr.AET,
-		// CreatedAt:        eastr.CreatedAt,
-		// UpdatedAt:        eastr.UpdatedAt,
+		IPAddress:        eastr.IPAddress.Value,
+		IPPort:           eastr.IPPort.Value,
+		AET:              eastr.AET.Value,
+		CreatedAt:        eastr.CreatedAt.Value,
+		UpdatedAt:        updatedAt,
 	})
 	if err != nil {
-		// TODO: return error
-		tflog.Info(ctx, err.Error())
+		tflog.Info(ctx, "EA Store Update: "+err.Error())
 	}
 	eastr.ID = id.(types.String)
 
 	err = resp.State.Set(ctx, &eastr)
 	if err != nil {
-		// TODO: return error
-		tflog.Info(ctx, err.Error())
+		tflog.Info(ctx, "EA Store Update: "+err.Error())
 	}
 }
 
 func (e eastoreResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+
+	tflog.Info(ctx, "EA Store Delete..")
+
 	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
 	if err != nil {
-		// TODO: return error
+		tflog.Info(ctx, "EA Store Delete: "+err.Error())
 	}
 	err = e.client.EAStores.Delete(ctx, id.(types.String).Value)
 	if err != nil && !errors.Is(err, edison.ErrEAStoreNotFound) {
-		// TODO: return error
+		tflog.Info(ctx, "EA Store Delete: "+err.Error())
 	}
 	resp.State.RemoveResource(ctx)
 }
