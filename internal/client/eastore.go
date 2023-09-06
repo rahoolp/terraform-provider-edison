@@ -27,13 +27,13 @@ func newEAStoreService(basePath string, client *Client) *EAStoresService {
 }
 
 type EAStore struct {
-	ID               string  `json:"id,omitempty"`
-	PartitionSpaceTB int64   `json:"partition_space_tb"`
-	IPAddress        *string `json:"ip_address"` //* allows for null, aka null value
-	IPPort           *string `json:"ip_port"`
-	AET              *string `json:"aet"`
-	CreatedAt        *string `json:"created_at"`
-	UpdatedAt        *string `json:"updated_at"`
+	ID               string `json:"id,omitempty"`
+	PartitionSpaceTB int64  `json:"partition_space_tb"`
+	IPAddress        string `json:"ip_address,omitempty"` //* allows for null, aka null value
+	IPPort           string `json:"ip_port,omitempty"`
+	AET              string `json:"aet,omitempty"`
+	CreatedAt        string `json:"created_at,omitempty"`
+	UpdatedAt        string `json:"updated_at,omitempty"`
 	//DeletedAt        sql.NullString `db:"deleted_at" json:"-"`
 }
 

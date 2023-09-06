@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	edison "github.com/rahoolp/terraform-provider-edison/internal/client"
 )
 
@@ -29,23 +30,23 @@ func (e eastoreResourceType) GetSchema(_ context.Context) (schema.Schema, []*tfp
 			},
 			"ip_address": {
 				Type:     types.StringType,
-				Optional: true,
+				Computed: true,
 			},
 			"ip_port": {
 				Type:     types.StringType,
-				Optional: true,
+				Computed: true,
 			},
 			"aet": {
 				Type:     types.StringType,
-				Optional: true,
+				Computed: true,
 			},
 			"created_at": {
 				Type:     types.StringType,
-				Optional: true,
+				Computed: true,
 			},
 			"updated_at": {
 				Type:     types.StringType,
-				Optional: true,
+				Computed: true,
 			},
 		},
 	}, nil
@@ -54,11 +55,11 @@ func (e eastoreResourceType) GetSchema(_ context.Context) (schema.Schema, []*tfp
 type eastoreData struct {
 	ID               types.String `tfsdk:"id"`
 	PartitionSpaceTB int64        `tfsdk:"partition_space_tb"`
-	IPAddress        *string      `tfsdk:"ip_address"`
-	IPPort           *string      `tfsdk:"ip_port"`
-	AET              *string      `tfsdk:"aet"`
-	CreatedAt        *string      `tfsdk:"created_at"`
-	UpdatedAt        *string      `tfsdk:"updated_at"`
+	IPAddress        types.String `tfsdk:"ip_address"`
+	IPPort           types.String `tfsdk:"ip_port"`
+	AET              types.String `tfsdk:"aet"`
+	CreatedAt        types.String `tfsdk:"created_at"`
+	UpdatedAt        types.String `tfsdk:"updated_at"`
 }
 
 func (s eastoreResourceType) NewResource(_ context.Context, p tfsdk.Provider) (tfsdk.Resource, []*tfprotov6.Diagnostic) {
@@ -91,47 +92,68 @@ func (e eastoreResource) Create(ctx context.Context, req tfsdk.CreateResourceReq
 		return
 	}
 
+	var id string = "1"
+	var ipAddress string = "192.168.1.1"
+	var ipPort string = "4242"
+	var aet string = "AET1"
+	var createdAt string = "2023-01-01T00:00:00Z"
+	var updatedAt string = "2023-01-01T00:00:00Z"
+
 	eastore, err := e.client.EAStores.Create(ctx, edison.EAStore{
+		ID:               id,
 		PartitionSpaceTB: eastr.PartitionSpaceTB,
-		IPAddress:        eastr.IPAddress,
-		IPPort:           eastr.IPPort,
-		AET:              eastr.AET,
-		CreatedAt:        eastr.CreatedAt,
-		UpdatedAt:        eastr.UpdatedAt,
+		IPAddress:        ipAddress,
+		IPPort:           ipPort,
+		AET:              aet,
+		CreatedAt:        createdAt,
+		UpdatedAt:        updatedAt,
 	})
 	if err != nil {
 		// TODO: return error
+		tflog.Info(ctx, err.Error())
 	}
+
 	eastr.ID = types.String{Value: eastore.ID}
+	eastr.PartitionSpaceTB = eastore.PartitionSpaceTB
+	eastr.IPAddress = types.String{Value: ipAddress}
+	eastr.IPPort = types.String{Value: ipPort}
+	eastr.AET = types.String{Value: aet}
+	eastr.CreatedAt = types.String{Value: createdAt}
+	eastr.UpdatedAt = types.String{Value: updatedAt}
 
 	err = resp.State.Set(ctx, &eastr)
 	if err != nil {
 		// TODO: return error
+		tflog.Info(ctx, err.Error())
 	}
 }
 
-func (s eastoreResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (e eastoreResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
 	id, err := req.State.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"))
 	if err != nil {
 		// TODO: return error
 	}
-	speaker, err := s.client.Speakers.Get(ctx, id.(types.String).Value)
+	eastr, err := e.client.EAStores.Get(ctx, id.(types.String).Value)
 	if err != nil && !errors.Is(err, edison.ErrSpeakerNotFound) {
 		// TODO: return error
 	} else if errors.Is(err, edison.ErrSpeakerNotFound) {
 		resp.State.RemoveResource(ctx)
 		return
 	}
-	err = resp.State.Set(ctx, &speakerData{
-		ID:       types.String{Value: speaker.ID},
-		Name:     speaker.Name,
-		Title:    speaker.Title,
-		Employer: speaker.Employer,
-		Pronouns: speaker.Pronouns,
-		Photo:    speaker.Photo,
+
+	err = resp.State.Set(ctx, &eastoreData{
+		ID:               types.String{Value: eastr.ID},
+		PartitionSpaceTB: eastr.PartitionSpaceTB,
+		IPAddress:        types.String{Value: eastr.IPAddress},
+		IPPort:           types.String{Value: eastr.IPPort},
+		AET:              types.String{Value: eastr.AET},
+		CreatedAt:        types.String{Value: eastr.CreatedAt},
+		UpdatedAt:        types.String{Value: eastr.UpdatedAt},
 	})
+
 	if err != nil {
 		// TODO: return error
+		tflog.Info(ctx, err.Error())
 	}
 }
 
@@ -140,28 +162,31 @@ func (e eastoreResource) Update(ctx context.Context, req tfsdk.UpdateResourceReq
 	if err != nil {
 		// TODO: return error
 	}
-	var spkr speakerData
-	err = req.Plan.Get(ctx, &spkr)
+	var eastr eastoreData
+	err = req.Plan.Get(ctx, &eastr)
 	if err != nil {
 		// TODO: return error
 	}
 
-	_, err = e.client.Speakers.Update(ctx, edison.Speaker{
-		ID:       id.(types.String).Value,
-		Name:     spkr.Name,
-		Title:    spkr.Title,
-		Employer: spkr.Employer,
-		Pronouns: spkr.Pronouns,
-		Photo:    spkr.Photo,
+	_, err = e.client.EAStores.Update(ctx, edison.EAStore{
+		ID:               id.(types.String).Value,
+		PartitionSpaceTB: eastr.PartitionSpaceTB,
+		// IPAddress:        eastr.IPAddress,
+		// IPPort:           eastr.IPPort,
+		// AET:              eastr.AET,
+		// CreatedAt:        eastr.CreatedAt,
+		// UpdatedAt:        eastr.UpdatedAt,
 	})
 	if err != nil {
 		// TODO: return error
+		tflog.Info(ctx, err.Error())
 	}
-	spkr.ID = id.(types.String)
+	eastr.ID = id.(types.String)
 
-	err = resp.State.Set(ctx, &spkr)
+	err = resp.State.Set(ctx, &eastr)
 	if err != nil {
 		// TODO: return error
+		tflog.Info(ctx, err.Error())
 	}
 }
 
@@ -170,8 +195,8 @@ func (e eastoreResource) Delete(ctx context.Context, req tfsdk.DeleteResourceReq
 	if err != nil {
 		// TODO: return error
 	}
-	err = e.client.Speakers.Delete(ctx, id.(types.String).Value)
-	if err != nil && !errors.Is(err, edison.ErrSpeakerNotFound) {
+	err = e.client.EAStores.Delete(ctx, id.(types.String).Value)
+	if err != nil && !errors.Is(err, edison.ErrEAStoreNotFound) {
 		// TODO: return error
 	}
 	resp.State.RemoveResource(ctx)

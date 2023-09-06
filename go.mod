@@ -10,4 +10,5 @@ require (
 	github.com/hashicorp/go-uuid v1.0.2
 	github.com/hashicorp/terraform-plugin-framework v0.1.1-0.20210721014642-f89b01bbbf40
 	github.com/hashicorp/terraform-plugin-go v0.3.1
+	github.com/hashicorp/terraform-plugin-log v0.9.0
 )
