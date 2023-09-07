@@ -53,6 +53,10 @@ func (e ehsclusterResourceType) GetSchema(_ context.Context) (schema.Schema, []*
 				Type:     types.StringType,
 				Computed: true,
 			},
+			"cluster_name": {
+				Type:     types.StringType,
+				Computed: true,
+			},
 			"created_at": {
 				Type:     types.StringType,
 				Computed: true,
@@ -74,6 +78,7 @@ type ehsclusterData struct {
 	DicomEndPoint     types.String `tfsdk:"dicom_endpoint"`
 	APIServerEndPoint types.String `tfsdk:"api_server_endpoint"`
 	VPC               types.String `tfsdk:"vpc"`
+	ClusterName       types.String `tfsdk:"cluster_name"`
 	CreatedAt         types.String `tfsdk:"created_at"`
 	UpdatedAt         types.String `tfsdk:"updated_at"`
 }
@@ -114,6 +119,7 @@ func (e ehsclusterResource) Create(ctx context.Context, req tfsdk.CreateResource
 
 	var vpc string = "vpc-0c6aa52f85161d3cc"
 	var apiSrvEP string = "https://5a4028bb2291be0fa29ab9717a8b9e92.gr7.us-east-1.eks.amazonaws.com/"
+	var cluster_name string = ehscluster.Tag.Value
 	now := time.Now()
 	var createdAt string = now.Format("2006-01-02 15:04:05")
 	var updatedAt string = now.Format("2006-01-02 15:04:05")
@@ -123,6 +129,8 @@ func (e ehsclusterResource) Create(ctx context.Context, req tfsdk.CreateResource
 		Profile:           ehscluster.Profile.Value,
 		Release:           ehscluster.Release.Value,
 		VPC:               vpc,
+		Tag:               ehscluster.Tag.Value,
+		ClusterName:       cluster_name,
 		APIServerEndPoint: apiSrvEP,
 		DicomEndPoint:     ehscluster.DicomEndPoint.Value,
 		CreatedAt:         createdAt,
@@ -137,6 +145,7 @@ func (e ehsclusterResource) Create(ctx context.Context, req tfsdk.CreateResource
 	ehscluster.UpdatedAt = types.String{Value: ecluster.UpdatedAt}
 	ehscluster.APIServerEndPoint = types.String{Value: apiSrvEP}
 	ehscluster.VPC = types.String{Value: vpc}
+	ehscluster.ClusterName = types.String{Value: cluster_name}
 
 	err = resp.State.Set(ctx, &ehscluster)
 	if err != nil {
@@ -167,6 +176,7 @@ func (e ehsclusterResource) Read(ctx context.Context, req tfsdk.ReadResourceRequ
 		Region:            types.String{Value: ehscluster.Region},
 		Release:           types.String{Value: ehscluster.Release},
 		VPC:               types.String{Value: ehscluster.VPC},
+		ClusterName:       types.String{Value: ehscluster.ClusterName},
 		Tag:               types.String{Value: ehscluster.Tag},
 		APIServerEndPoint: types.String{Value: ehscluster.APIServerEndPoint},
 		DicomEndPoint:     types.String{Value: ehscluster.DicomEndPoint},
@@ -204,6 +214,7 @@ func (e ehsclusterResource) Update(ctx context.Context, req tfsdk.UpdateResource
 		Release:           ehscluster.Release.Value,
 		VPC:               ehscluster.VPC.Value,
 		Tag:               ehscluster.Tag.Value,
+		ClusterName:       ehscluster.ClusterName.Value,
 		APIServerEndPoint: ehscluster.APIServerEndPoint.Value,
 		DicomEndPoint:     ehscluster.DicomEndPoint.Value,
 		CreatedAt:         ehscluster.CreatedAt.Value,

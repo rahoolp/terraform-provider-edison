@@ -32,6 +32,7 @@ type EHSCluster struct {
 	Profile           string `json:"profile"`
 	Release           string `json:"release"`
 	Tag               string `json:"tag"`
+	ClusterName       string `json:"cluster_name"`
 	DicomEndPoint     string `json:"dicom_endpoint"`
 	APIServerEndPoint string `json:"api_server_endpoint,omitempty"`
 	VPC               string `json:"vpc,omitempty"`
