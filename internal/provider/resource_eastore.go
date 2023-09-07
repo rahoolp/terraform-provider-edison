@@ -84,6 +84,7 @@ type eastoreResource struct {
 func (e eastoreResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
 
 	tflog.Info(ctx, "EA Store Create..")
+	fmt.Println("EA Store Create")
 
 	var eastr eastoreData
 	err := req.Plan.Get(ctx, &eastr)

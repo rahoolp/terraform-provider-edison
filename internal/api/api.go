@@ -35,6 +35,11 @@ func (a API) Server(baseURL string) http.Handler {
 	router.Endpoint("/eastores/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutEAStore))
 	router.Endpoint("/eastores/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteEAStore))
 
+	router.Endpoint("/ehsclusters").Methods(http.MethodPost).Handler(http.HandlerFunc(a.handlePostEHSCluster))
+	router.Endpoint("/ehsclusters/{id}").Methods(http.MethodGet).Handler(http.HandlerFunc(a.handleGetEHSCluster))
+	router.Endpoint("/ehsclusters/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutEHSCluster))
+	router.Endpoint("/ehsclusters/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteEHSCluster))
+
 	return api.NegotiateMiddleware(router)
 }
 
@@ -43,10 +48,11 @@ func isAuthenticated(r *http.Request) bool {
 }
 
 type Response struct {
-	Talks     []Talk             `json:"talks,omitempty"`
-	Speakers  []Speaker          `json:"speakers,omitempty"`
-	Workshops []Workshop         `json:"workshops,omitempty"`
-	Errors    []api.RequestError `json:"errors,omitempty"`
-	Status    int                `json:"-"`
-	EAStores  []EAStore          `json:"eastores,omitempty"`
+	Talks       []Talk             `json:"talks,omitempty"`
+	Speakers    []Speaker          `json:"speakers,omitempty"`
+	Workshops   []Workshop         `json:"workshops,omitempty"`
+	Errors      []api.RequestError `json:"errors,omitempty"`
+	Status      int                `json:"-"`
+	EAStores    []EAStore          `json:"eastores,omitempty"`
+	EHSClusters []EHSCluster       `json:"ehsclusters,omitempty"`
 }

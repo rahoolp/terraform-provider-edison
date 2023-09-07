@@ -108,10 +108,11 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 
 func (p *provider) GetResources(_ context.Context) (map[string]tfsdk.ResourceType, []*tfprotov6.Diagnostic) {
 	return map[string]tfsdk.ResourceType{
-		"edison_speaker":  speakerResourceType{},
-		"edison_talk":     talkResourceType{},
-		"edison_workshop": workshopResourceType{},
-		"edison_eastore":  eastoreResourceType{},
+		"edison_speaker":    speakerResourceType{},
+		"edison_talk":       talkResourceType{},
+		"edison_workshop":   workshopResourceType{},
+		"edison_eastore":    eastoreResourceType{},
+		"edison_ehscluster": ehsclusterResourceType{},
 	}, nil
 }
 

@@ -14,8 +14,10 @@ var (
 	ErrWorkshopNotFound      = errors.New("workshop  not found")
 	ErrWorkshopAlreadyExists = errors.New("workshop already exists")
 
-	ErrEAStoreNotFound      = errors.New("EAStore  not found")
-	ErrEAStoreAlreadyExists = errors.New("EAStore already exists")
+	ErrEAStoreNotFound         = errors.New("EAStore  not found")
+	ErrEAStoreAlreadyExists    = errors.New("EAStore already exists")
+	ErrEHSClusterNotFound      = errors.New("EHSCluster not found")
+	ErrEHSClusterAlreadyExists = errors.New("EHSCluster already exists")
 )
 
 type Storer struct {
@@ -57,6 +59,16 @@ func NewStorer() (*Storer, error) {
 			},
 			"eastore": {
 				Name: "eastore",
+				Indexes: map[string]*memdb.IndexSchema{
+					"id": {
+						Name:    "id",
+						Unique:  true,
+						Indexer: &memdb.StringFieldIndex{Field: "ID", Lowercase: true},
+					},
+				},
+			},
+			"ehscluster": {
+				Name: "ehscluster",
 				Indexes: map[string]*memdb.IndexSchema{
 					"id": {
 						Name:    "id",
@@ -273,6 +285,8 @@ func (s *Storer) DeleteWorkshop(id string) error {
 	return nil
 }
 
+//-----------------------
+
 func (s *Storer) GetEAStore(id string) (EAStore, error) {
 	txn := s.db.Txn(false)
 	ap, err := txn.First("eastore", "id", id)
@@ -332,6 +346,72 @@ func (s *Storer) DeleteEAStore(id string) error {
 		return ErrEAStoreNotFound
 	}
 	err = txn.Delete("eastore", existing)
+	if err != nil {
+		return err
+	}
+	txn.Commit()
+	return nil
+}
+
+func (s *Storer) GetEHSCluster(id string) (EHSCluster, error) {
+	txn := s.db.Txn(false)
+	ap, err := txn.First("ehscluster", "id", id)
+	if err != nil {
+		return EHSCluster{}, err
+	}
+	if ap == nil {
+		return EHSCluster{}, ErrEHSClusterNotFound
+	}
+	return *ap.(*EHSCluster), nil
+}
+
+func (s *Storer) CreateEHSCluster(ap EHSCluster) error {
+	txn := s.db.Txn(true)
+	defer txn.Abort()
+	exists, err := txn.First("ehscluster", "id", ap.ID)
+	if err != nil {
+		return err
+	}
+	if exists != nil {
+		return ErrEHSClusterAlreadyExists
+	}
+	err = txn.Insert("ehscluster", &ap)
+	if err != nil {
+		return err
+	}
+	txn.Commit()
+	return nil
+}
+
+func (s *Storer) UpdateEHSCluster(ap EHSCluster) error {
+	txn := s.db.Txn(true)
+	defer txn.Abort()
+	existing, err := txn.First("ehscluster", "id", ap.ID)
+	if err != nil {
+		return err
+	}
+	if existing == nil {
+		return ErrEHSClusterNotFound
+	}
+	err = txn.Insert("ehscluster", &ap)
+	if err != nil {
+		return err
+	}
+	txn.Commit()
+	return nil
+}
+
+func (s *Storer) DeleteEHSCluster(id string) error {
+	txn := s.db.Txn(true)
+	defer txn.Abort()
+	existing, err := txn.First("ehscluster", "id", id)
+	if err != nil {
+		return err
+	}
+	if existing == nil {
+		return ErrEHSClusterNotFound
+	}
+	err = txn.Delete("ehscluster", existing)
 	if err != nil {
 		return err
 	}
