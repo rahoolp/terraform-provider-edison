@@ -41,10 +41,10 @@ func (e ehsclusterResourceType) GetSchema(_ context.Context) (schema.Schema, []*
 				Type:     types.StringType,
 				Required: true,
 			},
-			"dicom_endpoint": {
-				Type:     types.StringType,
-				Required: true,
-			},
+			// "dicom_endpoint": {
+			// 	Type:     types.StringType,
+			// 	Required: true,
+			// },
 			"api_server_endpoint": {
 				Type:     types.StringType,
 				Computed: true,
@@ -70,12 +70,12 @@ func (e ehsclusterResourceType) GetSchema(_ context.Context) (schema.Schema, []*
 }
 
 type ehsclusterData struct {
-	ID                types.String `tfsdk:"id"`
-	Region            types.String `tfsdk:"region"`
-	Profile           types.String `tfsdk:"profile"`
-	Release           types.String `tfsdk:"release"`
-	Tag               types.String `tfsdk:"tag"`
-	DicomEndPoint     types.String `tfsdk:"dicom_endpoint"`
+	ID      types.String `tfsdk:"id"`
+	Region  types.String `tfsdk:"region"`
+	Profile types.String `tfsdk:"profile"`
+	Release types.String `tfsdk:"release"`
+	Tag     types.String `tfsdk:"tag"`
+	//DicomEndPoint     types.String `tfsdk:"dicom_endpoint"`
 	APIServerEndPoint types.String `tfsdk:"api_server_endpoint"`
 	VPC               types.String `tfsdk:"vpc"`
 	ClusterName       types.String `tfsdk:"cluster_name"`
@@ -132,9 +132,9 @@ func (e ehsclusterResource) Create(ctx context.Context, req tfsdk.CreateResource
 		Tag:               ehscluster.Tag.Value,
 		ClusterName:       cluster_name,
 		APIServerEndPoint: apiSrvEP,
-		DicomEndPoint:     ehscluster.DicomEndPoint.Value,
-		CreatedAt:         createdAt,
-		UpdatedAt:         updatedAt,
+		//DicomEndPoint:     ehscluster.DicomEndPoint.Value,
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
 	})
 	if err != nil {
 		tflog.Info(ctx, "EHS Cluster Create: "+err.Error())
@@ -163,9 +163,9 @@ func (e ehsclusterResource) Read(ctx context.Context, req tfsdk.ReadResourceRequ
 	}
 
 	ehscluster, err := e.client.EHSClusters.Get(ctx, id.(types.String).Value)
-	if err != nil && !errors.Is(err, edison.ErrSpeakerNotFound) {
+	if err != nil && !errors.Is(err, edison.ErrEHSClusterNotFound) {
 		tflog.Info(ctx, "EHS Cluster Read: "+err.Error())
-	} else if errors.Is(err, edison.ErrSpeakerNotFound) {
+	} else if errors.Is(err, edison.ErrEHSClusterNotFound) {
 		resp.State.RemoveResource(ctx)
 		return
 	}
@@ -179,9 +179,9 @@ func (e ehsclusterResource) Read(ctx context.Context, req tfsdk.ReadResourceRequ
 		ClusterName:       types.String{Value: ehscluster.ClusterName},
 		Tag:               types.String{Value: ehscluster.Tag},
 		APIServerEndPoint: types.String{Value: ehscluster.APIServerEndPoint},
-		DicomEndPoint:     types.String{Value: ehscluster.DicomEndPoint},
-		CreatedAt:         types.String{Value: ehscluster.CreatedAt},
-		UpdatedAt:         types.String{Value: ehscluster.UpdatedAt},
+		//DicomEndPoint:     types.String{Value: ehscluster.DicomEndPoint},
+		CreatedAt: types.String{Value: ehscluster.CreatedAt},
+		UpdatedAt: types.String{Value: ehscluster.UpdatedAt},
 	})
 
 	if err != nil {
@@ -216,9 +216,9 @@ func (e ehsclusterResource) Update(ctx context.Context, req tfsdk.UpdateResource
 		Tag:               ehscluster.Tag.Value,
 		ClusterName:       ehscluster.ClusterName.Value,
 		APIServerEndPoint: ehscluster.APIServerEndPoint.Value,
-		DicomEndPoint:     ehscluster.DicomEndPoint.Value,
-		CreatedAt:         ehscluster.CreatedAt.Value,
-		UpdatedAt:         updatedAt,
+		//DicomEndPoint:     ehscluster.DicomEndPoint.Value,
+		CreatedAt: ehscluster.CreatedAt.Value,
+		UpdatedAt: updatedAt,
 	})
 	if err != nil {
 		tflog.Info(ctx, "EHS Cluster Update: "+err.Error())

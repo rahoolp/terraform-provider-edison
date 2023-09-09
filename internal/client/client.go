@@ -16,11 +16,9 @@ type Client struct {
 
 	token string
 
-	Speakers    *SpeakersService
-	Talks       *TalksService
-	Workshops   *WorkshopsService
 	EAStores    *EAStoresService
 	EHSClusters *EHSClustersService
+	AWs         *AWsService
 }
 
 func NewClient(baseURL, token string) (*Client, error) {
@@ -33,11 +31,9 @@ func NewClient(baseURL, token string) (*Client, error) {
 		baseURL: base,
 		token:   token,
 	}
-	c.Speakers = newSpeakersService("speakers", c)
-	c.Talks = newTalksService("talks", c)
-	c.Workshops = newWorkshopsService("workshops", c)
 	c.EAStores = newEAStoreService("eastores", c)
 	c.EHSClusters = newEHSClusterService("ehsclusters", c)
+	c.AWs = newAWService("aws", c)
 	return c, nil
 }
 

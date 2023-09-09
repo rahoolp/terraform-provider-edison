@@ -9,12 +9,12 @@ import (
 )
 
 type EHSCluster struct {
-	ID                string `json:"id,omitempty"`
-	Region            string `json:"region"`
-	Profile           string `json:"profile"`
-	Release           string `json:"release"`
-	Tag               string `json:"tag"`
-	DicomEndPoint     string `json:"dicom_endpoint"`
+	ID      string `json:"id,omitempty"`
+	Region  string `json:"region"`
+	Profile string `json:"profile"`
+	Release string `json:"release"`
+	Tag     string `json:"tag"`
+	//DicomEndPoint     string `json:"dicom_endpoint"`
 	APIServerEndPoint string `json:"api_server_endpoint,omitempty"`
 	VPC               string `json:"vpc,omitempty"`
 	ClusterName       string `json:"cluster_name,omitempty"`

@@ -15,21 +15,6 @@ func (a API) Server(baseURL string) http.Handler {
 	var router trout.Router
 	router.SetPrefix(baseURL)
 
-	router.Endpoint("/talks").Methods(http.MethodPost).Handler(http.HandlerFunc(a.handlePostTalk))
-	router.Endpoint("/talks/{id}").Methods(http.MethodGet).Handler(http.HandlerFunc(a.handleGetTalk))
-	router.Endpoint("/talks/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutTalk))
-	router.Endpoint("/talks/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteTalk))
-
-	router.Endpoint("/speakers").Methods(http.MethodPost).Handler(http.HandlerFunc(a.handlePostSpeaker))
-	router.Endpoint("/speakers/{id}").Methods(http.MethodGet).Handler(http.HandlerFunc(a.handleGetSpeaker))
-	router.Endpoint("/speakers/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutSpeaker))
-	router.Endpoint("/speakers/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteSpeaker))
-
-	router.Endpoint("/workshops").Methods(http.MethodPost).Handler(http.HandlerFunc(a.handlePostWorkshop))
-	router.Endpoint("/workshops/{id}").Methods(http.MethodGet).Handler(http.HandlerFunc(a.handleGetWorkshop))
-	router.Endpoint("/workshops/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutWorkshop))
-	router.Endpoint("/workshops/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteWorkshop))
-
 	router.Endpoint("/eastores").Methods(http.MethodPost).Handler(http.HandlerFunc(a.handlePostEAStore))
 	router.Endpoint("/eastores/{id}").Methods(http.MethodGet).Handler(http.HandlerFunc(a.handleGetEAStore))
 	router.Endpoint("/eastores/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutEAStore))
@@ -40,6 +25,11 @@ func (a API) Server(baseURL string) http.Handler {
 	router.Endpoint("/ehsclusters/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutEHSCluster))
 	router.Endpoint("/ehsclusters/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteEHSCluster))
 
+	router.Endpoint("/aws").Methods(http.MethodPost).Handler(http.HandlerFunc(a.handlePostAW))
+	router.Endpoint("/aws/{id}").Methods(http.MethodGet).Handler(http.HandlerFunc(a.handleGetAW))
+	router.Endpoint("/aws/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutAW))
+	router.Endpoint("/aws/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteAW))
+
 	return api.NegotiateMiddleware(router)
 }
 
@@ -48,11 +38,9 @@ func isAuthenticated(r *http.Request) bool {
 }
 
 type Response struct {
-	Talks       []Talk             `json:"talks,omitempty"`
-	Speakers    []Speaker          `json:"speakers,omitempty"`
-	Workshops   []Workshop         `json:"workshops,omitempty"`
 	Errors      []api.RequestError `json:"errors,omitempty"`
 	Status      int                `json:"-"`
 	EAStores    []EAStore          `json:"eastores,omitempty"`
 	EHSClusters []EHSCluster       `json:"ehsclusters,omitempty"`
+	AWs         []AW               `json:"aws,omitempty"`
 }

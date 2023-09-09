@@ -27,13 +27,13 @@ func newEHSClusterService(basePath string, client *Client) *EHSClustersService {
 }
 
 type EHSCluster struct {
-	ID                string `json:"id,omitempty"`
-	Region            string `json:"region"`
-	Profile           string `json:"profile"`
-	Release           string `json:"release"`
-	Tag               string `json:"tag"`
-	ClusterName       string `json:"cluster_name"`
-	DicomEndPoint     string `json:"dicom_endpoint"`
+	ID          string `json:"id,omitempty"`
+	Region      string `json:"region"`
+	Profile     string `json:"profile"`
+	Release     string `json:"release"`
+	Tag         string `json:"tag"`
+	ClusterName string `json:"cluster_name"`
+	//DicomEndPoint     string `json:"dicom_endpoint"`
 	APIServerEndPoint string `json:"api_server_endpoint,omitempty"`
 	VPC               string `json:"vpc,omitempty"`
 	CreatedAt         string `json:"created_at,omitempty"`
@@ -81,12 +81,12 @@ func (s EHSClustersService) Create(ctx context.Context, ehscluster EHSCluster) (
 	}) {
 		return EHSCluster{}, errors.New("region must be set")
 	}
-	if resp.Errors.Contains(RequestError{
-		Slug:  requestErrMissing,
-		Field: "/dicom_endpoint",
-	}) {
-		return EHSCluster{}, errors.New("dicom_endpoint must be set")
-	}
+	// if resp.Errors.Contains(RequestError{
+	// 	Slug:  requestErrMissing,
+	// 	Field: "/dicom_endpoint",
+	// }) {
+	// 	return EHSCluster{}, errors.New("dicom_endpoint must be set")
+	// }
 	if resp.Errors.Contains(RequestError{
 		Slug:  requestErrMissing,
 		Field: "/profile",

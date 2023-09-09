@@ -142,9 +142,9 @@ func (e eastoreResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest
 	}
 
 	eastr, err := e.client.EAStores.Get(ctx, id.(types.String).Value)
-	if err != nil && !errors.Is(err, edison.ErrSpeakerNotFound) {
+	if err != nil && !errors.Is(err, edison.ErrEAStoreNotFound) {
 		tflog.Info(ctx, "EA Store Read: "+err.Error())
-	} else if errors.Is(err, edison.ErrSpeakerNotFound) {
+	} else if errors.Is(err, edison.ErrEAStoreNotFound) {
 		resp.State.RemoveResource(ctx)
 		return
 	}

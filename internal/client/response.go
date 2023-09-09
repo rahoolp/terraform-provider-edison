@@ -26,13 +26,11 @@ var (
 )
 
 type Response struct {
-	Speakers    []Speaker     `json:"speakers,omitempty"`
-	Talks       []Talk        `json:"talks,omitempty"`
-	Workshops   []Workshop    `json:"workshops,omitempty"`
 	Errors      RequestErrors `json:"errors,omitempty"`
 	Status      int           `json:"-"`
 	EAStores    []EAStore     `json:"eastores,omitempty"`
 	EHSClusters []EHSCluster  `json:"ehsclusters,omitempty"`
+	AWs         []AW          `json:"aws,omitempty"`
 }
 
 func responseFromBody(resp *http.Response) (Response, error) {
