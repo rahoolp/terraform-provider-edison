@@ -3,10 +3,10 @@ variable "partition_space_tb" {
   type        = string
 }
 
-resource "edison_eastore" "uwm-ea" {
+resource "edison_eastore" "tenant-ea" {
   partition_space_tb = var.partition_space_tb
 }
 
-output "uwm-ea" {
-  value = edison_eastore.uwm-ea
+output "tenant-ea" {
+  value = edison_eastore.tenant-ea
 }

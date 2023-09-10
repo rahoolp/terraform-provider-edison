@@ -15,15 +15,15 @@ variable "tag" {
   type        = string
 }
 
-resource "edison_ehscluster" "uwm-ehs" {
+resource "edison_ehscluster" "tenant-ehs" {
   region = var.region
   profile = var.profile
   release = var.release
   tag = var.tag
-  depends_on = [edison_eastore.uwm-ea]
-  dicom_endpoint = join("@", [join(":", [edison_eastore.uwm-ea.ip_address, edison_eastore.uwm-ea.ip_port]), edison_eastore.uwm-ea.aet])
+  depends_on = [edison_eastore.tenant-ea]
+  dicom_endpoint = join("@", [join(":", [edison_eastore.tenant-ea.ip_address, edison_eastore.tenant-ea.ip_port]), edison_eastore.tenant-ea.aet])
 }
 
-output "uwm-ehs" {
-  value = edison_ehscluster.uwm-ehs
+output "tenant-ehs" {
+  value = edison_ehscluster.tenant-ehs
 }
