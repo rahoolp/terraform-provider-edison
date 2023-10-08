@@ -2,6 +2,9 @@
 api_endpoint = "http://localhost:12345/"
 token = "secrettoken"
 
+#AV config:
+account_id = "309"
+tenant_id = "uwm-01"
 
 #AW config:
 concurrent_users = 4

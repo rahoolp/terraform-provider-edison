@@ -41,6 +41,14 @@ func (e eastoreResourceType) GetSchema(_ context.Context) (schema.Schema, []*tfp
 				Type:     types.StringType,
 				Computed: true,
 			},
+			"account_id": {
+				Type:     types.StringType,
+				Computed: true,
+			},
+			"service_ep": {
+				Type:     types.StringType,
+				Computed: true,
+			},
 			"created_at": {
 				Type:     types.StringType,
 				Computed: true,
@@ -59,6 +67,8 @@ type eastoreData struct {
 	IPAddress        types.String `tfsdk:"ip_address"`
 	IPPort           types.String `tfsdk:"ip_port"`
 	AET              types.String `tfsdk:"aet"`
+	AccountID        types.String `tfsdk:"account_id"`
+	ServiceEP        types.String `tfsdk:"service_ep"`
 	CreatedAt        types.String `tfsdk:"created_at"`
 	UpdatedAt        types.String `tfsdk:"updated_at"`
 }
@@ -101,6 +111,8 @@ func (e eastoreResource) Create(ctx context.Context, req tfsdk.CreateResourceReq
 	var ipAddress string = "192.168.1.1"
 	var ipPort string = "4242"
 	var aet string = "AET1"
+	var account_id string = "3091120"
+	var service_ep string = "eadicom_ep"
 	now := time.Now()
 	var createdAt string = now.Format("2006-01-02 15:04:05")
 	var updatedAt string = now.Format("2006-01-02 15:04:05")
@@ -111,6 +123,8 @@ func (e eastoreResource) Create(ctx context.Context, req tfsdk.CreateResourceReq
 		IPAddress:        ipAddress,
 		IPPort:           ipPort,
 		AET:              aet,
+		AccountID:        account_id,
+		ServiceEP:        service_ep,
 		CreatedAt:        createdAt,
 		UpdatedAt:        updatedAt,
 	})
@@ -123,6 +137,8 @@ func (e eastoreResource) Create(ctx context.Context, req tfsdk.CreateResourceReq
 	eastr.IPAddress = types.String{Value: ipAddress}
 	eastr.IPPort = types.String{Value: ipPort}
 	eastr.AET = types.String{Value: aet}
+	eastr.AccountID = types.String{Value: account_id}
+	eastr.ServiceEP = types.String{Value: service_ep}
 	eastr.CreatedAt = types.String{Value: createdAt}
 	eastr.UpdatedAt = types.String{Value: updatedAt}
 
@@ -155,6 +171,8 @@ func (e eastoreResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest
 		IPAddress:        types.String{Value: eastr.IPAddress},
 		IPPort:           types.String{Value: eastr.IPPort},
 		AET:              types.String{Value: eastr.AET},
+		AccountID:        types.String{Value: eastr.AccountID},
+		ServiceEP:        types.String{Value: eastr.ServiceEP},
 		CreatedAt:        types.String{Value: eastr.CreatedAt},
 		UpdatedAt:        types.String{Value: eastr.UpdatedAt},
 	})
@@ -188,6 +206,8 @@ func (e eastoreResource) Update(ctx context.Context, req tfsdk.UpdateResourceReq
 		IPAddress:        eastr.IPAddress.Value,
 		IPPort:           eastr.IPPort.Value,
 		AET:              eastr.AET.Value,
+		AccountID:        eastr.AccountID.Value,
+		ServiceEP:        eastr.IPAddress.Value,
 		CreatedAt:        eastr.CreatedAt.Value,
 		UpdatedAt:        updatedAt,
 	})

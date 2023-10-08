@@ -41,6 +41,18 @@ func (e awResourceType) GetSchema(_ context.Context) (schema.Schema, []*tfprotov
 				Type:     types.StringType,
 				Computed: true,
 			},
+			"ea_account_id": {
+				Type:     types.StringType,
+				Required: true,
+			},
+			"ea_service_ep": {
+				Type:     types.StringType,
+				Required: true,
+			},
+			"ea_vpc_ep": {
+				Type:     types.StringType,
+				Computed: true,
+			},
 			"created_at": {
 				Type:     types.StringType,
 				Computed: true,
@@ -59,6 +71,9 @@ type awData struct {
 	DicomEndPoint   types.String `tfsdk:"dicom_endpoint"`
 	DNSEndPoint     types.String `tfsdk:"dns_endpoint"`
 	EHSClusterID    types.String `tfsdk:"ehs_cluster_id"`
+	EAAccounID      types.String `tfsdk:"ea_account_id"`
+	EAServiceEP     types.String `tfsdk:"ea_service_ep"`
+	EAVpcEP         types.String `tfsdk:"ea_vpc_ep"`
 	CreatedAt       types.String `tfsdk:"created_at"`
 	UpdatedAt       types.String `tfsdk:"updated_at"`
 }
@@ -98,6 +113,7 @@ func (e awResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest,
 	}
 
 	var dnsEP string = "https://aw-04.ehs.edison.gehealthcare.com/"
+	var vpcEP string = "vpc-1a2b3c4d"
 	now := time.Now()
 	var createdAt string = now.Format("2006-01-02 15:04:05")
 	var updatedAt string = now.Format("2006-01-02 15:04:05")
@@ -107,6 +123,9 @@ func (e awResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest,
 		DicomEndPoint:   aw.DicomEndPoint.Value,
 		EHSClusterID:    aw.EHSClusterID.Value,
 		DNSEndPoint:     dnsEP,
+		EAAccounID:      aw.EAAccounID.Value,
+		EAServiceEP:     aw.EAServiceEP.Value,
+		EAVpcEP:         vpcEP,
 		CreatedAt:       createdAt,
 		UpdatedAt:       updatedAt,
 	})
@@ -118,6 +137,7 @@ func (e awResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest,
 	aw.CreatedAt = types.String{Value: eaw.CreatedAt}
 	aw.UpdatedAt = types.String{Value: eaw.UpdatedAt}
 	aw.DNSEndPoint = types.String{Value: dnsEP}
+	aw.EAVpcEP = types.String{Value: vpcEP}
 
 	err = resp.State.Set(ctx, &aw)
 	if err != nil {
@@ -147,6 +167,9 @@ func (e awResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, res
 		ConcurrentUsers: aw.ConcurrentUsers,
 		DicomEndPoint:   types.String{Value: aw.DicomEndPoint},
 		DNSEndPoint:     types.String{Value: aw.DNSEndPoint},
+		EAAccounID:      types.String{Value: aw.EAAccounID},
+		EAServiceEP:     types.String{Value: aw.EAServiceEP},
+		EAVpcEP:         types.String{Value: aw.EAVpcEP},
 		CreatedAt:       types.String{Value: aw.CreatedAt},
 		UpdatedAt:       types.String{Value: aw.UpdatedAt},
 	})
@@ -179,6 +202,9 @@ func (e awResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest,
 		ConcurrentUsers: aw.ConcurrentUsers,
 		DicomEndPoint:   aw.DicomEndPoint.Value,
 		DNSEndPoint:     aw.DNSEndPoint.Value,
+		EAAccounID:      aw.EAAccounID.Value,
+		EAServiceEP:     aw.EAServiceEP.Value,
+		EAVpcEP:         aw.EAVpcEP.Value,
 		CreatedAt:       aw.CreatedAt.Value,
 		UpdatedAt:       updatedAt,
 	})

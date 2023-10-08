@@ -111,6 +111,7 @@ func (p *provider) GetResources(_ context.Context) (map[string]tfsdk.ResourceTyp
 		"edison_eastore":    eastoreResourceType{},
 		"edison_ehscluster": ehsclusterResourceType{},
 		"edison_aw":         awResourceType{},
+		"edison_av":         avResourceType{},
 	}, nil
 }
 

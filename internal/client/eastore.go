@@ -32,6 +32,8 @@ type EAStore struct {
 	IPAddress        string `json:"ip_address,omitempty"` //omitempty allows for null, aka null value
 	IPPort           string `json:"ip_port,omitempty"`
 	AET              string `json:"aet,omitempty"`
+	AccountID        string `json:"account_id,omitempty"`
+	ServiceEP        string `json:"service_ep,omitempty"`
 	CreatedAt        string `json:"created_at,omitempty"`
 	UpdatedAt        string `json:"updated_at,omitempty"`
 	//DeletedAt        sql.NullString `db:"deleted_at" json:"-"`

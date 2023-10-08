@@ -13,6 +13,8 @@ var (
 	ErrEHSClusterAlreadyExists = errors.New("EHSCluster already exists")
 	ErrAWNotFound              = errors.New("AW not found")
 	ErrAWAlreadyExists         = errors.New("AW already exists")
+	ErrAVNotFound              = errors.New("AV not found")
+	ErrAVAlreadyExists         = errors.New("AV already exists")
 )
 
 type Storer struct {
@@ -44,6 +46,16 @@ func NewStorer() (*Storer, error) {
 			},
 			"aw": {
 				Name: "aw",
+				Indexes: map[string]*memdb.IndexSchema{
+					"id": {
+						Name:    "id",
+						Unique:  true,
+						Indexer: &memdb.StringFieldIndex{Field: "ID", Lowercase: true},
+					},
+				},
+			},
+			"av": {
+				Name: "av",
 				Indexes: map[string]*memdb.IndexSchema{
 					"id": {
 						Name:    "id",
@@ -253,6 +265,72 @@ func (s *Storer) DeleteAW(id string) error {
 		return ErrAWNotFound
 	}
 	err = txn.Delete("aw", existing)
+	if err != nil {
+		return err
+	}
+	txn.Commit()
+	return nil
+}
+
+func (s *Storer) GetAV(id string) (AV, error) {
+	txn := s.db.Txn(false)
+	ap, err := txn.First("av", "id", id)
+	if err != nil {
+		return AV{}, err
+	}
+	if ap == nil {
+		return AV{}, ErrAWNotFound
+	}
+	return *ap.(*AV), nil
+}
+
+func (s *Storer) CreateAV(ap AV) error {
+	txn := s.db.Txn(true)
+	defer txn.Abort()
+	exists, err := txn.First("av", "id", ap.ID)
+	if err != nil {
+		return err
+	}
+	if exists != nil {
+		return ErrAWAlreadyExists
+	}
+	err = txn.Insert("av", &ap)
+	if err != nil {
+		return err
+	}
+	txn.Commit()
+	return nil
+}
+
+func (s *Storer) UpdateAV(ap AV) error {
+	txn := s.db.Txn(true)
+	defer txn.Abort()
+	existing, err := txn.First("av", "id", ap.ID)
+	if err != nil {
+		return err
+	}
+	if existing == nil {
+		return ErrAWNotFound
+	}
+	err = txn.Insert("av", &ap)
+	if err != nil {
+		return err
+	}
+	txn.Commit()
+	return nil
+}
+
+func (s *Storer) DeleteAV(id string) error {
+	txn := s.db.Txn(true)
+	defer txn.Abort()
+	existing, err := txn.First("av", "id", id)
+	if err != nil {
+		return err
+	}
+	if existing == nil {
+		return ErrAWNotFound
+	}
+	err = txn.Delete("av", existing)
 	if err != nil {
 		return err
 	}

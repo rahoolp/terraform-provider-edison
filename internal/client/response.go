@@ -31,6 +31,7 @@ type Response struct {
 	EAStores    []EAStore     `json:"eastores,omitempty"`
 	EHSClusters []EHSCluster  `json:"ehsclusters,omitempty"`
 	AWs         []AW          `json:"aws,omitempty"`
+	AVs         []AV          `json:"avs,omitempty"`
 }
 
 func responseFromBody(resp *http.Response) (Response, error) {

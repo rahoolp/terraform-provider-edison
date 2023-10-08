@@ -30,6 +30,11 @@ func (a API) Server(baseURL string) http.Handler {
 	router.Endpoint("/aws/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutAW))
 	router.Endpoint("/aws/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteAW))
 
+	router.Endpoint("/avs").Methods(http.MethodPost).Handler(http.HandlerFunc(a.handlePostAV))
+	router.Endpoint("/avs/{id}").Methods(http.MethodGet).Handler(http.HandlerFunc(a.handleGetAV))
+	router.Endpoint("/avs/{id}").Methods(http.MethodPut).Handler(http.HandlerFunc(a.handlePutAV))
+	router.Endpoint("/avs/{id}").Methods(http.MethodDelete).Handler(http.HandlerFunc(a.handleDeleteAV))
+
 	return api.NegotiateMiddleware(router)
 }
 
@@ -43,4 +48,5 @@ type Response struct {
 	EAStores    []EAStore          `json:"eastores,omitempty"`
 	EHSClusters []EHSCluster       `json:"ehsclusters,omitempty"`
 	AWs         []AW               `json:"aws,omitempty"`
+	AVs         []AV               `json:"avs,omitempty"`
 }

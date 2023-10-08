@@ -32,6 +32,9 @@ type AW struct {
 	EHSClusterID    string `json:"ehs_cluster_id"`
 	DicomEndPoint   string `json:"dicom_endpoint"`
 	DNSEndPoint     string `json:"dns_endpoint,omitempty"`
+	EAAccounID      string `json:"ea_account_id"`
+	EAServiceEP     string `json:"ea_service_ep"`
+	EAVpcEP         string `json:"ea_vpc_ep,omitempty"`
 	CreatedAt       string `json:"created_at,omitempty"`
 	UpdatedAt       string `json:"updated_at,omitempty"`
 }
